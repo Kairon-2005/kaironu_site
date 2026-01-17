@@ -458,7 +458,12 @@ import '../styles/global.css';
         canvas.height = window.innerHeight;
       }
 
-      function createStars(count = 200) {
+      function createStars(count) {
+        // Responsive star count based on screen size
+        if (!count) {
+          const targetCount = Math.min(1200, Math.floor((canvas.width * canvas.height) / 4500));
+          count = targetCount;
+        }
         stars = [];
         for (let i = 0; i < count; i++) {
           stars.push({
@@ -676,7 +681,8 @@ import '../styles/global.css';
         // Layer change keys
         if (e.key === 'Enter' && !e.repeat) {
           e.preventDefault();
-          warpTransition(currentLayer + 1);
+          const nextLayer = (currentLayer % totalLayers) + 1;
+          warpTransition(nextLayer);
         }
 
         if ((e.key === 'f' || e.key === 'F' || e.key === ' ') && !e.repeat) {
