@@ -1,9 +1,51 @@
 [
   {
-    "text": "The best code is the code you don't write.",
-    "source": "Programming wisdom",
-    "date": "2025-01-15",
-    "tags": ["code", "simplicity"]
+    "text": "方生方死、方死方生；方可方不可、方不可方可；因是因非，因非因是。",
+    "source": "Zhuangzi",
+    "date": "2025-01-18",
+    "tags": ["daoism", "philosophy"]
+  },
+  {
+    "text": "Nous sommes engagés dans le monde.",
+    "source": "Maurice Merleau-Ponty",
+    "date": "2025-01-18",
+    "tags": ["phenomenology", "philosophy"]
+  },
+  {
+    "text": "Tempora non sunt, sed fiunt.",
+    "source": "Augustine of Hippo",
+    "date": "2025-01-18",
+    "tags": ["time", "philosophy", "theology"]
+  },
+  {
+    "text": "L'homme est condamné à être libre.",
+    "source": "Jean-Paul Sartre",
+    "date": "2025-01-18",
+    "tags": ["existentialism", "philosophy"]
+  },
+  {
+    "text": "Pecca fortiter et crede firmius!",
+    "source": "Martin Luther",
+    "date": "2025-01-18",
+    "tags": ["faith", "theology"]
+  },
+  {
+    "text": "Sentimus experimurque nos aeternos esse.",
+    "source": "Baruch Spinoza",
+    "date": "2025-01-18",
+    "tags": ["eternity", "philosophy"]
+  },
+  {
+    "text": "Dieses Leben, wie du es jetzt lebst und gelebt hast, wirst du noch einmal und noch unzählige Male leben müssen; und es wird nichts Neues daran sein, sondern jeder Schmerz und jede Lust und jeder Gedanke und Seufzer und alles unsäglich Kleine und Große deines Lebens muss dir wiederkommen.",
+    "source": "Friedrich Nietzsche",
+    "date": "2025-01-18",
+    "tags": ["philosophy", "existence"]
+  },
+  {
+    "text": "如果我继续谈论爱，我可以说出一百种联系，但那仍然不代表我已说出奥秘。心存恐惧的苦行者用脚奔跑，爱者却如风雷电闪般移动。根本无法相比。当神学家还在那里为自由与必然的问题苦思冥索，爱者与被爱者早已把自己推向彼此。",
+    "source": "Rumi",
+    "date": "2025-01-18",
+    "tags": ["poem", "love"]
   },
   {
     "text": "We are the universe experiencing itself.",
@@ -11,24 +53,7 @@
     "date": "2025-01-14",
     "tags": ["cosmos", "philosophy"]
   },
-  {
-    "text": "Every exit is an entry somewhere else.",
-    "source": "Tom Stoppard",
-    "date": "2025-01-12",
-    "tags": ["transitions", "perspective"]
-  },
-  {
-    "text": "The only way out is through.",
-    "source": "Robert Frost",
-    "date": "2025-01-10",
-    "tags": ["perseverance"]
-  },
-  {
-    "text": "In the middle of difficulty lies opportunity.",
-    "source": "Albert Einstein",
-    "date": "2025-01-08",
-    "tags": ["opportunity", "challenge"]
-  },
+
   {
     "text": "Reality is merely an illusion, albeit a very persistent one.",
     "source": "Albert Einstein",
