@@ -1,8 +1,8 @@
-import { c as createComponent, r as renderHead, d as addAttribute, b as renderTemplate } from '../chunks/astro/server_CYfxY4af.mjs';
+import { c as createComponent, r as renderHead, d as addAttribute, b as renderTemplate } from '../chunks/astro/server_B2hf15fw.mjs';
 import 'piccolore';
 import 'clsx';
 /* empty css                                 */
-import { g as getCollection, c as countWords } from '../chunks/wordCount_D3j4iEOs.mjs';
+import { g as getCollection, c as countWords } from '../chunks/wordCount_DR0jgTX-.mjs';
 export { renderers } from '../renderers.mjs';
 
 const $$Writings = createComponent(async ($$result, $$props, $$slots) => {

@@ -1,46 +1,15 @@
 import type { APIRoute } from 'astro';
 import { sql } from '@vercel/postgres';
-
-function constantTimeCompare(a: string, b: string): boolean {
-  if (a.length !== b.length) {
-    return false;
-  }
-  
-  let result = 0;
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  
-  return result === 0;
-}
+import { validateAuth, validateEnvVars } from '../../../../utils/auth';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
+    // Validate required environment variables
+    validateEnvVars(['ADMIN_USER', 'ADMIN_PASS']);
+    
     // Basic Auth check
-    const auth = request.headers.get('Authorization');
-    const ADMIN_USER = process.env.ADMIN_USER;
-    const ADMIN_PASS = process.env.ADMIN_PASS;
-    if (!ADMIN_USER || !ADMIN_PASS) {
-    throw new Error('Missing ADMIN_USER / ADMIN_PASS env vars');
-}
-
-    if (!auth) {
-      return new Response(JSON.stringify({ ok: false, error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    const [scheme, encoded] = auth.split(' ');
-    if (scheme !== 'Basic') {
-      return new Response(JSON.stringify({ ok: false, error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    const [user, pass] = atob(encoded).split(':');
-    if (!constantTimeCompare(user, ADMIN_USER) || !constantTimeCompare(pass, ADMIN_PASS)) {
+    const authResult = validateAuth(request);
+    if (!authResult.ok) {
       return new Response(JSON.stringify({ ok: false, error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
@@ -67,34 +36,35 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Use template literal approach - more secure and readable
-    if (data.status && data.replyText !== undefined) {
-      // Both status and reply text updates
-      if (data.replyText && data.replyText.trim()) {
-        await sql`UPDATE messages SET 
-          status = ${data.status}, 
-          reply_text = ${data.replyText},
-          replied_at = now()
-          WHERE id = ${data.id}`;
-      } else {
-        await sql`UPDATE messages SET 
-          status = ${data.status}, 
-          reply_text = ${data.replyText}
-          WHERE id = ${data.id}`;
-      }
-    } else if (data.status) {
-      // Status update only
+    // Update message status if provided
+    if (hasValidStatus) {
       await sql`UPDATE messages SET status = ${data.status} WHERE id = ${data.id}`;
-    } else if (data.replyText !== undefined) {
-      // Reply text update only
-      if (data.replyText && data.replyText.trim()) {
-        await sql`UPDATE messages SET 
-          reply_text = ${data.replyText},
-          replied_at = now()
-          WHERE id = ${data.id}`;
+    }
+
+    // Handle reply text update
+    if (hasReplyText && data.replyText && data.replyText.trim()) {
+      // Check if a reply already exists
+      const existingReply = await sql`
+        SELECT id FROM replies WHERE message_id = ${data.id}
+      `;
+      
+      if (existingReply.rows.length > 0) {
+        // Update existing reply
+        await sql`
+          UPDATE replies 
+          SET reply_body = ${data.replyText.trim()}, created_at = now()
+          WHERE message_id = ${data.id}
+        `;
       } else {
-        await sql`UPDATE messages SET reply_text = ${data.replyText} WHERE id = ${data.id}`;
+        // Create new reply
+        await sql`
+          INSERT INTO replies (message_id, reply_body)
+          VALUES (${data.id}, ${data.replyText.trim()})
+        `;
       }
+    } else if (hasReplyText && (!data.replyText || !data.replyText.trim())) {
+      // Delete reply if empty text provided
+      await sql`DELETE FROM replies WHERE message_id = ${data.id}`;
     }
 
     return new Response(JSON.stringify({ ok: true }), {

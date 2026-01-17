@@ -23,50 +23,59 @@ import '../styles/global.css';
 
       <!-- Form -->
       <form id="messageForm" class="space-y-8">
-        <!-- Anonymous toggle -->
+        <!-- Nickname field -->
         <div class="space-y-3">
-          <label class="flex items-center space-x-3 cursor-pointer">
-            <input type="checkbox" id="anonymous" checked class="w-4 h-4 bg-transparent border border-[#F5F2EA] rounded">
-            <span class="text-[#F5F2EA]">Anonymous</span>
-          </label>
-        </div>
-
-        <!-- Display name (hidden when anonymous) -->
-        <div id="nameField" class="space-y-3 hidden">
-          <label for="displayName" class="block text-[#F5F2EA] text-sm">Name</label>
-          <input type="text" id="displayName" name="displayName" 
+          <label for="nickname" class="block text-[#F5F2EA] text-sm">Name (optional)</label>
+          <input type="text" id="nickname" name="nickname" 
                  class="w-full bg-transparent border border-[#F5F2EA] rounded px-4 py-3 text-[#F5F2EA] placeholder-gray-500 focus:outline-none focus:border-white transition-colors duration-300"
-                 placeholder="Your name">
+                 placeholder="Leave blank to be anonymous">
         </div>
 
-        <!-- Mode selector -->
+        <!-- Message type selector -->
         <div class="space-y-3">
-          <label class="block text-[#F5F2EA] text-sm">Type</label>
+          <label class="block text-[#F5F2EA] text-sm">Message Type</label>
           <div class="space-y-2">
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="radio" name="mode" value="public" class="w-4 h-4 border border-[#F5F2EA] bg-transparent">
+              <input type="radio" name="type" value="public" class="w-4 h-4 border border-[#F5F2EA] bg-transparent">
               <span class="text-[#F5F2EA]">Public letter</span>
+              <span class="text-[#F5F2EA]/60 text-sm ml-2">(reply will be published on site)</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="radio" name="mode" value="private" checked class="w-4 h-4 border border-[#F5F2EA] bg-transparent">
-              <span class="text-[#F5F2EA]">Private message</span>
+              <input type="radio" name="type" value="treehole" checked class="w-4 h-4 border border-[#F5F2EA] bg-transparent">
+              <span class="text-[#F5F2EA]">Treehole</span>
+              <span class="text-[#F5F2EA]/60 text-sm ml-2">(no reply, just store)</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer">
+              <input type="radio" name="type" value="private" class="w-4 h-4 border border-[#F5F2EA] bg-transparent">
+              <span class="text-[#F5F2EA]">Private reply</span>
+              <span class="text-[#F5F2EA]/60 text-sm ml-2">(you want a private reply)</span>
             </label>
           </div>
         </div>
 
-        <!-- Reply preference -->
-        <div class="space-y-3">
-          <label class="block text-[#F5F2EA] text-sm">Reply</label>
+        <!-- Reply options (shown only for private messages) -->
+        <div id="replyOptions" class="space-y-3 hidden">
+          <label class="block text-[#F5F2EA] text-sm">How would you like to receive your reply?</label>
           <div class="space-y-2">
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="radio" name="replyPreference" value="none" checked class="w-4 h-4 border border-[#F5F2EA] bg-transparent">
-              <span class="text-[#F5F2EA]">No reply</span>
+              <input type="radio" name="replyPreference" value="key" checked class="w-4 h-4 border border-[#F5F2EA] bg-transparent">
+              <span class="text-[#F5F2EA]">Key-based retrieval</span>
+              <span class="text-[#F5F2EA]/60 text-sm ml-2">(you'll get a key to check back later)</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="radio" name="replyPreference" value="key" class="w-4 h-4 border border-[#F5F2EA] bg-transparent">
-              <span class="text-[#F5F2EA]">Allow reply via key</span>
+              <input type="radio" name="replyPreference" value="email" class="w-4 h-4 border border-[#F5F2EA] bg-transparent">
+              <span class="text-[#F5F2EA]">Email notification</span>
+              <span class="text-[#F5F2EA]/60 text-sm ml-2">(provide email below)</span>
             </label>
           </div>
+        </div>
+
+        <!-- Email field (shown only when email option is selected) -->
+        <div id="emailField" class="space-y-3 hidden">
+          <label for="email" class="block text-[#F5F2EA] text-sm">Email Address</label>
+          <input type="email" id="email" name="email" 
+                 class="w-full bg-transparent border border-[#F5F2EA] rounded px-4 py-3 text-[#F5F2EA] placeholder-gray-500 focus:outline-none focus:border-white transition-colors duration-300"
+                 placeholder="your@email.com">
         </div>
 
         <!-- Message body -->
@@ -131,23 +140,54 @@ import '../styles/global.css';
     </style>
 
     <script>
-      const anonymous = document.getElementById('anonymous');
-      const nameField = document.getElementById('nameField');
-      const displayNameInput = document.getElementById('displayName');
+      // DOM elements
       const form = document.getElementById('messageForm');
       const submitBtn = document.getElementById('submitBtn');
       const error = document.getElementById('error');
+      const typeInputs = document.querySelectorAll('input[name="type"]');
+      const replyOptions = document.getElementById('replyOptions');
+      const replyPreferenceInputs = document.querySelectorAll('input[name="replyPreference"]');
+      const emailField = document.getElementById('emailField');
+      const emailInput = document.getElementById('email');
 
-      // Toggle name field visibility
-      anonymous.addEventListener('change', () => {
-        if (anonymous.checked) {
-          nameField.classList.add('hidden');
-          displayNameInput.required = false;
+      // Toggle reply options based on message type
+      function updateReplyOptions() {
+        const selectedType = document.querySelector('input[name="type"]:checked').value;
+        
+        if (selectedType === 'private') {
+          replyOptions.classList.remove('hidden');
+          updateEmailField();
         } else {
-          nameField.classList.remove('hidden');
-          displayNameInput.required = true;
+          replyOptions.classList.add('hidden');
+          emailField.classList.add('hidden');
+          emailInput.required = false;
         }
+      }
+
+      // Toggle email field based on reply preference
+      function updateEmailField() {
+        const selectedPref = document.querySelector('input[name="replyPreference"]:checked')?.value;
+        
+        if (selectedPref === 'email') {
+          emailField.classList.remove('hidden');
+          emailInput.required = true;
+        } else {
+          emailField.classList.add('hidden');
+          emailInput.required = false;
+        }
+      }
+
+      // Event listeners for dynamic UI
+      typeInputs.forEach(input => {
+        input.addEventListener('change', updateReplyOptions);
       });
+
+      replyPreferenceInputs.forEach(input => {
+        input.addEventListener('change', updateEmailField);
+      });
+
+      // Initialize UI state
+      updateReplyOptions();
 
       // Form submission
       form.addEventListener('submit', async (e) => {
@@ -158,13 +198,25 @@ import '../styles/global.css';
         error.classList.add('hidden');
 
         const formData = new FormData(form);
+        const selectedType = document.querySelector('input[name="type"]:checked').value;
+        
         const data = {
-          isAnonymous: anonymous.checked,
-          displayName: anonymous.checked ? 'Anonymous' : (formData.get('displayName') || ''),
-          mode: formData.get('mode'),
-          replyPreference: formData.get('replyPreference'),
+          nickname: formData.get('nickname') || null,
+          type: selectedType,
           body: formData.get('body')
         };
+
+        // Add reply preferences for private messages
+        if (selectedType === 'private') {
+          const replyPref = document.querySelector('input[name="replyPreference"]:checked').value;
+          data.replyPreference = replyPref;
+          
+          if (replyPref === 'email') {
+            data.email = formData.get('email');
+          }
+        } else {
+          data.replyPreference = 'none';
+        }
 
         try {
           const response = await fetch('/api/message', {
@@ -177,8 +229,10 @@ import '../styles/global.css';
 
           if (result.ok) {
             if (result.key) {
+              // Redirect to key display page
               window.location.href = `/message/key/${result.id}?k=${encodeURIComponent(result.key)}`;
             } else {
+              // Redirect to sent confirmation
               window.location.href = '/message/sent';
             }
           } else {

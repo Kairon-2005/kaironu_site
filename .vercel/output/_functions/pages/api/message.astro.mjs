@@ -1,19 +1,9 @@
 import { sql } from '@vercel/postgres';
-import crypto from 'crypto';
+import { c as createIpHash, g as generateReplyKey, h as hashReplyKey } from '../../chunks/crypto_DOOsr3tZ.mjs';
+import { v as validateEnvVars } from '../../chunks/auth_xgDOlbyf.mjs';
 export { renderers } from '../../renderers.mjs';
 
 const rateLimitStore = /* @__PURE__ */ new Map();
-function createIpHash(ip, userAgent) {
-  const pepper = process.env.MESSAGE_KEY_PEPPER || "default-pepper-change-me";
-  return crypto.createHash("sha256").update(ip + userAgent + pepper).digest("hex");
-}
-function generateReplyKey() {
-  return crypto.randomBytes(16).toString("base64url");
-}
-function hashReplyKey(key) {
-  const pepper = process.env.MESSAGE_KEY_PEPPER || "default-pepper-change-me";
-  return crypto.createHash("sha256").update(key + pepper).digest("hex");
-}
 function checkRateLimit(ipHash) {
   const now = Date.now();
   const windowMs = 10 * 60 * 1e3;
@@ -31,6 +21,7 @@ function checkRateLimit(ipHash) {
 }
 const POST = async ({ request }) => {
   try {
+    validateEnvVars(["MESSAGE_KEY_PEPPER"]);
     const data = await request.json();
     if (!data.body || data.body.trim().length === 0) {
       return new Response(JSON.stringify({ ok: false, error: "Message body is required" }), {
@@ -38,14 +29,18 @@ const POST = async ({ request }) => {
         headers: { "Content-Type": "application/json" }
       });
     }
-    if (!data.mode || !["public", "private"].includes(data.mode)) {
-      return new Response(JSON.stringify({ ok: false, error: "Invalid mode" }), {
+    if (!data.type || !["public", "treehole", "private"].includes(data.type)) {
+      return new Response(JSON.stringify({ ok: false, error: "Invalid message type. Must be: public, treehole, or private" }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
     }
-    if (!data.replyPreference || !["none", "key"].includes(data.replyPreference)) {
-      return new Response(JSON.stringify({ ok: false, error: "Invalid reply preference" }), {
+    const validReplyPrefs = data.type === "private" ? ["email", "key"] : ["none"];
+    if (!data.replyPreference || !validReplyPrefs.includes(data.replyPreference)) {
+      return new Response(JSON.stringify({
+        ok: false,
+        error: `Invalid reply preference for ${data.type} message. Must be: ${validReplyPrefs.join(", ")}`
+      }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
@@ -67,12 +62,13 @@ const POST = async ({ request }) => {
     }
     const result = await sql`
       INSERT INTO messages (
-        mode, reply_preference, display_name, is_anonymous, body, 
-        ip_hash, user_agent, reply_key_hash
+        type, reply_preference, nickname, email, body, 
+        ip_hash, user_agent, key_hash, wants_reply, status
       ) VALUES (
-        ${data.mode}, ${data.replyPreference}, ${data.displayName || "Anonymous"}, 
-        ${Boolean(data.isAnonymous)}, ${data.body.trim()}, 
-        ${ipHash}, ${userAgent}, ${replyKeyHash}
+        ${data.type}, ${data.replyPreference}, ${data.nickname || null}, 
+        ${data.email || null}, ${data.body.trim()}, 
+        ${ipHash}, ${userAgent}, ${replyKeyHash}, ${data.replyPreference !== "none"},
+        'pending'
       )
       RETURNING id
     `;

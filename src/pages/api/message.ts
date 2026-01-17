@@ -1,23 +1,10 @@
 import type { APIRoute } from 'astro';
 import { sql } from '@vercel/postgres';
-import crypto from 'crypto';
+import { createIpHash, generateReplyKey, hashReplyKey } from '../../utils/crypto';
+import { validateEnvVars } from '../../utils/auth';
 
 // Rate limiting store (in-memory fallback)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-function createIpHash(ip: string, userAgent: string): string {
-  const pepper = process.env.MESSAGE_KEY_PEPPER || 'default-pepper-change-me';
-  return crypto.createHash('sha256').update(ip + userAgent + pepper).digest('hex');
-}
-
-function generateReplyKey(): string {
-  return crypto.randomBytes(16).toString('base64url');
-}
-
-function hashReplyKey(key: string): string {
-  const pepper = process.env.MESSAGE_KEY_PEPPER || 'default-pepper-change-me';
-  return crypto.createHash('sha256').update(key + pepper).digest('hex');
-}
 
 function checkRateLimit(ipHash: string): boolean {
   const now = Date.now();
@@ -41,6 +28,9 @@ function checkRateLimit(ipHash: string): boolean {
 
 export const POST: APIRoute = async ({ request }) => {
   try {
+    // Validate required environment variables
+    validateEnvVars(['MESSAGE_KEY_PEPPER']);
+    
     const data = await request.json();
     
     // Validate required fields
@@ -51,15 +41,21 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    if (!data.mode || !['public', 'private'].includes(data.mode)) {
-      return new Response(JSON.stringify({ ok: false, error: 'Invalid mode' }), {
+    // Validate message type - support public letter, treehole, and private reply
+    if (!data.type || !['public', 'treehole', 'private'].includes(data.type)) {
+      return new Response(JSON.stringify({ ok: false, error: 'Invalid message type. Must be: public, treehole, or private' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    if (!data.replyPreference || !['none', 'key'].includes(data.replyPreference)) {
-      return new Response(JSON.stringify({ ok: false, error: 'Invalid reply preference' }), {
+    // Validate reply preference
+    const validReplyPrefs = data.type === 'private' ? ['email', 'key'] : ['none'];
+    if (!data.replyPreference || !validReplyPrefs.includes(data.replyPreference)) {
+      return new Response(JSON.stringify({ 
+        ok: false, 
+        error: `Invalid reply preference for ${data.type} message. Must be: ${validReplyPrefs.join(', ')}` 
+      }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -92,12 +88,13 @@ export const POST: APIRoute = async ({ request }) => {
     // Insert message into database
     const result = await sql`
       INSERT INTO messages (
-        mode, reply_preference, display_name, is_anonymous, body, 
-        ip_hash, user_agent, reply_key_hash
+        type, reply_preference, nickname, email, body, 
+        ip_hash, user_agent, key_hash, wants_reply, status
       ) VALUES (
-        ${data.mode}, ${data.replyPreference}, ${data.displayName || 'Anonymous'}, 
-        ${Boolean(data.isAnonymous)}, ${data.body.trim()}, 
-        ${ipHash}, ${userAgent}, ${replyKeyHash}
+        ${data.type}, ${data.replyPreference}, ${data.nickname || null}, 
+        ${data.email || null}, ${data.body.trim()}, 
+        ${ipHash}, ${userAgent}, ${replyKeyHash}, ${data.replyPreference !== 'none'},
+        'pending'
       )
       RETURNING id
     `;

@@ -1,39 +1,12 @@
 import { sql } from '@vercel/postgres';
+import { v as validateEnvVars, a as validateAuth } from '../../../../chunks/auth_xgDOlbyf.mjs';
 export { renderers } from '../../../../renderers.mjs';
 
-function constantTimeCompare(a, b) {
-  if (a.length !== b.length) {
-    return false;
-  }
-  let result = 0;
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return result === 0;
-}
 const POST = async ({ request }) => {
   try {
-    const auth = request.headers.get("Authorization");
-    const ADMIN_USER = process.env.ADMIN_USER;
-    const ADMIN_PASS = process.env.ADMIN_PASS;
-    if (!ADMIN_USER || !ADMIN_PASS) {
-      throw new Error("Missing ADMIN_USER / ADMIN_PASS env vars");
-    }
-    if (!auth) {
-      return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" }
-      });
-    }
-    const [scheme, encoded] = auth.split(" ");
-    if (scheme !== "Basic") {
-      return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" }
-      });
-    }
-    const [user, pass] = atob(encoded).split(":");
-    if (!constantTimeCompare(user, ADMIN_USER) || !constantTimeCompare(pass, ADMIN_PASS)) {
+    validateEnvVars(["ADMIN_USER", "ADMIN_PASS"]);
+    const authResult = validateAuth(request);
+    if (!authResult.ok) {
       return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
         status: 401,
         headers: { "Content-Type": "application/json" }
@@ -54,30 +27,27 @@ const POST = async ({ request }) => {
         headers: { "Content-Type": "application/json" }
       });
     }
-    if (data.status && data.replyText !== void 0) {
-      if (data.replyText && data.replyText.trim()) {
-        await sql`UPDATE messages SET 
-          status = ${data.status}, 
-          reply_text = ${data.replyText},
-          replied_at = now()
-          WHERE id = ${data.id}`;
-      } else {
-        await sql`UPDATE messages SET 
-          status = ${data.status}, 
-          reply_text = ${data.replyText}
-          WHERE id = ${data.id}`;
-      }
-    } else if (data.status) {
+    if (hasValidStatus) {
       await sql`UPDATE messages SET status = ${data.status} WHERE id = ${data.id}`;
-    } else if (data.replyText !== void 0) {
-      if (data.replyText && data.replyText.trim()) {
-        await sql`UPDATE messages SET 
-          reply_text = ${data.replyText},
-          replied_at = now()
-          WHERE id = ${data.id}`;
+    }
+    if (hasReplyText && data.replyText && data.replyText.trim()) {
+      const existingReply = await sql`
+        SELECT id FROM replies WHERE message_id = ${data.id}
+      `;
+      if (existingReply.rows.length > 0) {
+        await sql`
+          UPDATE replies 
+          SET reply_body = ${data.replyText.trim()}, created_at = now()
+          WHERE message_id = ${data.id}
+        `;
       } else {
-        await sql`UPDATE messages SET reply_text = ${data.replyText} WHERE id = ${data.id}`;
+        await sql`
+          INSERT INTO replies (message_id, reply_body)
+          VALUES (${data.id}, ${data.replyText.trim()})
+        `;
       }
+    } else if (hasReplyText && (!data.replyText || !data.replyText.trim())) {
+      await sql`DELETE FROM replies WHERE message_id = ${data.id}`;
     }
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
