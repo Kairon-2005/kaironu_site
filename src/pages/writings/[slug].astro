@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 
 const { writing } = Astro.props;
 const { Content } = await render(writing);
-const wordCount = countWords(writing.body ?? '');
+const counts = countWords(writing.body ?? '');
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', {
@@ -21,6 +21,13 @@ function formatDate(date: Date): string {
     month: 'long',
     day: 'numeric'
   });
+}
+
+function formatLength(counts: { englishWords: number; chineseChars: number }): string {
+  const parts: string[] = [];
+  if (counts.englishWords > 0) parts.push(`${counts.englishWords} words`);
+  if (counts.chineseChars > 0) parts.push(`${counts.chineseChars} 字`);
+  return parts.join(' · ') || '0';
 }
 ---
 
@@ -47,7 +54,7 @@ function formatDate(date: Date): string {
           <span class="text-gray-700">·</span>
           <span>{writing.data.category}</span>
           <span class="text-gray-700">·</span>
-          <span>{wordCount} words</span>
+          <span>{formatLength(counts)}</span>
         </div>
       </header>
 
