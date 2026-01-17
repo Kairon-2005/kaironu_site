@@ -9,7 +9,9 @@ export default defineConfig({
   adapter: vercel({
     webAnalytics: {
       enabled: true
-    }
+    },
+    edgeMiddleware: false,
+    functionPerRoute: false
   }),
   vite: {
     plugins: [tailwindcss()]

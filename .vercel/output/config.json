@@ -44,19 +44,7 @@
 			"dest": "_render"
 		},
 		{
-			"src": "^/letters/([^/]+?)/?$",
-			"dest": "_render"
-		},
-		{
 			"src": "^/letters/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/message/key/([^/]+?)/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/message/reply/([^/]+?)/?$",
 			"dest": "_render"
 		},
 		{
@@ -65,10 +53,6 @@
 		},
 		{
 			"src": "^/message/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/writings/([^/]+?)/?$",
 			"dest": "_render"
 		},
 		{
