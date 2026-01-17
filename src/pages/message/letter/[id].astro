@@ -1,10 +1,7 @@
 ---
-import '../../styles/global.css';
+import '../../../styles/global.css';
 import { sql } from '@vercel/postgres';
 export const prerender = false;
-export async function getStaticPaths() {
-  return [];
-}
 
 const { id } = Astro.params;
 
@@ -21,7 +18,7 @@ try {
   if (result.rows.length > 0) {
     letter = result.rows[0];
   } else {
-    return Astro.redirect('/letters');
+    return Astro.redirect('/message/letters');
   }
 } catch (err) {
   error = err.message;
@@ -46,7 +43,7 @@ try {
             ← Home
           </a>
           <span class="text-[#F5F2EA]/50">•</span>
-          <a href="/letters" class="text-[#F5F2EA] hover:text-white transition-colors duration-300 text-lg">
+          <a href="/message/letters" class="text-[#F5F2EA] hover:text-white transition-colors duration-300 text-lg">
             ← Back to letters
           </a>
         </div>

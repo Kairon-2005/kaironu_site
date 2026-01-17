@@ -12,278 +12,40 @@ import '../styles/global.css';
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
   </head>
   <body class="bg-black overflow-hidden select-none m-0 p-0">
-    <!-- Eternal Return Canvas -->
-    <canvas id="aion" class="fixed inset-0 w-full h-full"></canvas>
+    <!-- Background elements -->
+    <div id="noise" class="fixed inset-0 opacity-5 mix-blend-overlay pointer-events-none"></div>
+    <canvas id="stars" class="fixed inset-0 w-full h-full pointer-events-none"></canvas>
+    
+    <!-- AION Canvas for Layer 1 -->
+    <canvas id="aion-canvas" class="fixed inset-0 w-full h-full pointer-events-none" style="z-index: 2;"></canvas>
+    
+    <!-- Bloom orbs -->
+    <div class="bloom-orb bloom-1"></div>
+    <div class="bloom-orb bloom-2"></div>
+    <div class="bloom-orb bloom-3"></div>
+    
+    <!-- FX overlays -->
+    <div id="warp-glow" class="warp-glow"></div>
+    <div id="rift-slit" class="rift-slit"></div>
+    <div id="vignette" class="vignette"></div>
 
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background: #0a0a0a;
-        overflow: hidden;
-      }
-      
-      #aion {
-        display: block;
-        cursor: none;
-      }
-    </style>
+    <!-- Layer container -->
+    <div id="drift-container" class="fixed inset-0">
+      <div id="portal" class="relative w-full h-full">
+        <!-- Layer 1: Landing/Home - AION Infinity -->
+        <div class="layer active" data-layer="1" data-route="/">
+          <div class="layer-content">
+            <div class="layer-bg layer-bg-void"></div>
+            <!-- AION visual is rendered on the canvas above -->
+            <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
+              <!-- Empty - the AION infinity + particles are drawn on canvas -->
+            </div>
+          </div>
+        </div>
 
-    <script>
-      /**
-       * ETERNAL RETURN / AION
-       * Layer 1: Abstract Ouroboros
-       * 
-       * An infinite loop of energy that dissolves and regenerates.
-       * The form breathes and flows, existing before and beyond user presence.
-       */
-
-      class EternalReturn {
-        constructor(canvas) {
-          this.canvas = canvas;
-          this.ctx = canvas.getContext('2d');
-          this.time = 0;
-          this.mouse = { x: 0, y: 0, influence: 0 };
-          
-          // Visual parameters - tune these for different feels
-          this.scale = 1.2;           // Overall size (>1 = overflows viewport)
-          this.baseRadius = 180;      // Base infinity loop radius
-          this.particleCount = 200;   // Number of flow particles
-          this.breathCycle = 16;      // Breathing rhythm in seconds
-          this.dissolveRate = 0.03;   // How fast particles dissolve/regenerate
-          
-          // Color palette
-          this.colors = {
-            primary: '#f8f6f0',       // Warm white
-            secondary: '#e8e4d8',     // Pale silver
-            accent: '#fff8e1',        // Soft gold hint
-            crystal: '#f0f8ff'        // Icy light blue
-          };
-          
-          this.particles = [];
-          this.setupCanvas();
-          this.initParticles();
-          this.bindEvents();
-          this.animate();
-        }
-
-        setupCanvas() {
-          const resize = () => {
-            this.canvas.width = window.innerWidth;
-            this.canvas.height = window.innerHeight;
-            this.centerX = this.canvas.width / 2;
-            this.centerY = this.canvas.height / 2;
-          };
-          
-          resize();
-          window.addEventListener('resize', resize);
-        }
-
-        bindEvents() {
-          // Subtle mouse parallax - very gentle influence
-          this.canvas.addEventListener('mousemove', (e) => {
-            this.mouse.x = (e.clientX - this.centerX) * 0.001;
-            this.mouse.y = (e.clientY - this.centerY) * 0.001;
-            this.mouse.influence = Math.min(this.mouse.influence + 0.02, 0.3);
-          });
-
-          this.canvas.addEventListener('mouseleave', () => {
-            this.mouse.influence *= 0.95;
-          });
-
-          // ENTER key for future layer transition
-          window.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-              // TODO: Implement transition to next layer
-              console.log('Transition triggered...');
-            }
-          });
-        }
-
-        initParticles() {
-          for (let i = 0; i < this.particleCount; i++) {
-            this.particles.push({
-              t: Math.random() * Math.PI * 4,      // Position along infinity curve
-              speed: 0.005 + Math.random() * 0.01, // Flow speed variation
-              alpha: Math.random(),                 // Transparency for dissolution
-              size: 0.5 + Math.random() * 2,       // Particle size variation
-              phase: Math.random() * Math.PI * 2,  // Individual breathing phase
-              noise: Math.random() * 0.1,          // Organic distortion amount
-            });
-          }
-        }
-
-        // Organic noise function for natural irregularity
-        noise(x, y, t) {
-          return (
-            Math.sin(x * 0.02 + t * 0.5) * 
-            Math.cos(y * 0.015 + t * 0.3) * 
-            Math.sin((x + y) * 0.01 + t * 0.7)
-          ) * 0.3;
-        }
-
-        // Parametric infinity curve (lemniscate) with organic distortion
-        getInfinityPoint(t, distortion = 1) {
-          // Base infinity/figure-8 shape
-          const scale = this.baseRadius * this.scale * distortion;
-          const x = scale * Math.cos(t) / (1 + Math.sin(t) * Math.sin(t));
-          const y = scale * Math.sin(t) * Math.cos(t) / (1 + Math.sin(t) * Math.sin(t));
-          
-          // Add organic distortion
-          const noiseX = this.noise(x, y, this.time) * 20;
-          const noiseY = this.noise(y, x, this.time + 100) * 20;
-          
-          // Subtle mouse parallax influence
-          const mouseX = this.mouse.x * this.mouse.influence * 50;
-          const mouseY = this.mouse.y * this.mouse.influence * 50;
-          
-          return {
-            x: this.centerX + x + noiseX + mouseX,
-            y: this.centerY + y + noiseY + mouseY
-          };
-        }
-
-        // Breathing animation - affects overall scale and intensity
-        getBreathingScale() {
-          const breathPhase = (this.time / this.breathCycle) * Math.PI * 2;
-          return 1 + Math.sin(breathPhase) * 0.08; // ±8% scale variation
-        }
-
-        getBreathingIntensity() {
-          const breathPhase = (this.time / this.breathCycle) * Math.PI * 2;
-          return 0.9 + Math.sin(breathPhase) * 0.1; // 10% brightness variation
-        }
-
-        render() {
-          // Clear with subtle texture (not pure black)
-          this.ctx.fillStyle = '#0a0a0a';
-          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-          
-          const breathing = this.getBreathingScale();
-          const intensity = this.getBreathingIntensity();
-          
-          // Render the eternal form in multiple passes for depth
-          this.renderEnergyFlow(breathing, intensity);
-          this.renderCoreStructure(breathing, intensity);
-          this.renderDissolution(breathing, intensity);
-        }
-
-        renderEnergyFlow(breathing, intensity) {
-          this.ctx.save();
-          
-          // Multiple glow layers for luminous depth
-          for (let glowPass = 0; glowPass < 3; glowPass++) {
-            this.ctx.shadowColor = this.colors.primary;
-            this.ctx.shadowBlur = (30 - glowPass * 8) * intensity;
-            this.ctx.globalCompositeOperation = 'screen';
-            
-            this.particles.forEach(particle => {
-              // Update particle position along curve
-              particle.t += particle.speed;
-              if (particle.t > Math.PI * 4) particle.t -= Math.PI * 4;
-              
-              // Get position on infinity curve
-              const pos = this.getInfinityPoint(particle.t, breathing);
-              
-              // Dissolution/regeneration effect
-              const dissolveCycle = Math.sin(this.time * this.dissolveRate + particle.phase);
-              particle.alpha = 0.3 + (dissolveCycle * 0.7) * intensity;
-              
-              // Render particle
-              this.ctx.globalAlpha = particle.alpha * (0.8 - glowPass * 0.2);
-              this.ctx.fillStyle = glowPass === 0 ? this.colors.crystal : this.colors.primary;
-              
-              this.ctx.beginPath();
-              this.ctx.arc(
-                pos.x + particle.noise * 10, 
-                pos.y + particle.noise * 8, 
-                particle.size * breathing, 
-                0, Math.PI * 2
-              );
-              this.ctx.fill();
-            });
-          }
-          
-          this.ctx.restore();
-        }
-
-        renderCoreStructure(breathing, intensity) {
-          this.ctx.save();
-          this.ctx.strokeStyle = this.colors.secondary;
-          this.ctx.lineWidth = 2 * breathing;
-          this.ctx.shadowColor = this.colors.primary;
-          this.ctx.shadowBlur = 15 * intensity;
-          this.ctx.globalCompositeOperation = 'screen';
-          this.ctx.globalAlpha = 0.4 * intensity;
-          
-          // Draw the underlying infinity structure
-          this.ctx.beginPath();
-          for (let t = 0; t < Math.PI * 4; t += 0.05) {
-            const pos = this.getInfinityPoint(t, breathing);
-            if (t === 0) {
-              this.ctx.moveTo(pos.x, pos.y);
-            } else {
-              this.ctx.lineTo(pos.x, pos.y);
-            }
-          }
-          this.ctx.stroke();
-          
-          this.ctx.restore();
-        }
-
-        renderDissolution(breathing, intensity) {
-          // Additional dissolution effects using composite blending
-          this.ctx.save();
-          this.ctx.globalCompositeOperation = 'screen';
-          
-          // Flowing energy streams that appear and disappear
-          for (let i = 0; i < 5; i++) {
-            const streamPhase = (this.time * 0.02 + i * 0.5) % 1;
-            const streamAlpha = Math.sin(streamPhase * Math.PI) * intensity * 0.3;
-            
-            if (streamAlpha > 0.1) {
-              this.ctx.globalAlpha = streamAlpha;
-              this.ctx.strokeStyle = this.colors.accent;
-              this.ctx.lineWidth = 1 * breathing;
-              this.ctx.shadowBlur = 20;
-              this.ctx.shadowColor = this.colors.primary;
-              
-              this.ctx.beginPath();
-              const startT = streamPhase * Math.PI * 4;
-              for (let t = 0; t < Math.PI * 0.5; t += 0.1) {
-                const pos = this.getInfinityPoint(startT + t, breathing);
-                if (t === 0) {
-                  this.ctx.moveTo(pos.x, pos.y);
-                } else {
-                  this.ctx.lineTo(pos.x, pos.y);
-                }
-              }
-              this.ctx.stroke();
-            }
-          }
-          
-          this.ctx.restore();
-        }
-
-        animate() {
-          this.time += 1/60; // 60fps time increment
-          
-          // Gradually reduce mouse influence when not moving
-          this.mouse.influence *= 0.99;
-          
-          this.render();
-          requestAnimationFrame(() => this.animate());
-        }
-      }
-
-      // Initialize when page loads
-      window.addEventListener('load', () => {
-        const canvas = document.getElementById('aion');
-        new EternalReturn(canvas);
-      });
-    </script>
-  </body>
-</html>
+        <!-- Layer 2: Writings -->
+        <div class="layer" data-layer="2" data-route="/writings">
+          <div class="layer-content">
             <div class="layer-bg layer-bg-monolith"></div>
             <div class="monolith-shapes"></div>
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
@@ -315,18 +77,6 @@ import '../styles/global.css';
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
               <a href="/message" class="gate-link" data-gate>
                 <span class="gate-text text-6xl md:text-8xl">Message</span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Layer 5: Letters -->
-        <div class="layer" data-layer="5" data-route="/letters">
-          <div class="layer-content">
-            <div class="layer-bg layer-bg-void"></div>
-            <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
-              <a href="/letters" class="gate-link" data-gate>
-                <span class="gate-text text-6xl md:text-8xl">Letters</span>
               </a>
             </div>
           </div>
@@ -372,8 +122,17 @@ import '../styles/global.css';
       body.layer-2 .bloom-1 { opacity: 1; }
       body.layer-3 .bloom-2 { opacity: 1; }
       body.layer-4 .bloom-3 { opacity: 1; }
-      body.layer-5 .bloom-1 { opacity: 0.7; }
       body.transitioning .bloom-orb { opacity: 0.3; transform: scale(1.5); }
+
+      /* AION canvas visibility */
+      #aion-canvas {
+        opacity: 1;
+        transition: opacity 0.8s ease;
+      }
+      body:not(.layer-1) #aion-canvas {
+        opacity: 0;
+        pointer-events: none;
+      }
 
       /* Gate typography */
       .gate-text {
@@ -654,13 +413,19 @@ import '../styles/global.css';
       #drift-container {
         transition: transform 0.15s ease-out;
       }
+
+      /* Text shadow fix for warm-white class */
+      .text-warm-white {
+        color: var(--warm-white);
+        text-shadow: 0 0 40px var(--warm-white-glow), 0 0 80px var(--warm-white-glow);
+      }
     </style>
 
     <script>
       // ============ STATE ============
       let currentLayer = 1;
       let isTransitioning = false;
-      const totalLayers = 5;
+      const totalLayers = 4;
 
       // Drift state
       const drift = { x: 0, y: 0, vx: 0, vy: 0 };
@@ -807,7 +572,7 @@ import '../styles/global.css';
 
       // ============ LAYER TRANSITIONS ============
       function updateLayerClass() {
-        document.body.classList.remove('layer-1', 'layer-2', 'layer-3', 'layer-4', 'layer-5');
+        document.body.classList.remove('layer-1', 'layer-2', 'layer-3', 'layer-4');
         document.body.classList.add(`layer-${currentLayer}`);
       }
 
@@ -1018,6 +783,365 @@ import '../styles/global.css';
       });
 
       console.log('[PORTAL] Initialized');
+    </script>
+
+    <!-- ============ AION INFINITY + PARTICLE TEXT SYSTEM ============ -->
+    <script>
+      /**
+       * AION - Animated Infinity Symbol with Particle Text
+       * 
+       * Tuning Constants:
+       */
+      const INFINITY_SCALE = 0.65;           // Scale relative to min(viewportW, viewportH)
+      const PARTICLE_COUNT_DESKTOP = 1100;   // Particle count for desktop
+      const PARTICLE_COUNT_MOBILE = 500;     // Particle count for mobile (< 768px)
+      const GLOW_INTENSITY = 0.8;            // Glow strength (0-1)
+      const BREATH_PERIOD_MS = 14000;        // Breathing cycle in ms (10-20s)
+      const NOISE_AMPLITUDE = 8;             // Organic wobble amount
+      const SHIMMER_SPEED = 0.002;           // Particle shimmer rate
+
+      class AionVisual {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.ctx = canvas.getContext('2d');
+          this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+          this.time = 0;
+          this.particles = [];
+          this.infinityPoints = [];
+          this.aionTargets = [];
+          
+          // Colors
+          this.warmWhite = { r: 245, g: 242, b: 234 };
+          this.accentSilver = { r: 200, g: 210, b: 220 };
+          this.accentGold = { r: 255, g: 240, b: 200 };
+          this.accentIce = { r: 220, g: 240, b: 255 };
+          
+          this.resize();
+          this.initParticles();
+          this.generateAionTargets();
+          this.animate();
+          
+          window.addEventListener('resize', () => this.resize());
+        }
+
+        resize() {
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          this.width = w;
+          this.height = h;
+          this.canvas.width = w * this.dpr;
+          this.canvas.height = h * this.dpr;
+          this.canvas.style.width = w + 'px';
+          this.canvas.style.height = h + 'px';
+          this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+          
+          this.centerX = w / 2;
+          this.centerY = h / 2;
+          this.baseSize = Math.min(w, h) * INFINITY_SCALE;
+          
+          // Regenerate targets on resize
+          this.generateAionTargets();
+        }
+
+        initParticles() {
+          const isMobile = window.innerWidth < 768;
+          const count = isMobile ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT_DESKTOP;
+          
+          this.particles = [];
+          for (let i = 0; i < count; i++) {
+            this.particles.push({
+              x: Math.random() * this.width,
+              y: Math.random() * this.height,
+              vx: (Math.random() - 0.5) * 0.5,
+              vy: (Math.random() - 0.5) * 0.5,
+              targetX: 0,
+              targetY: 0,
+              size: Math.random() * 1.5 + 0.5,
+              alpha: Math.random() * 0.5 + 0.3,
+              phase: Math.random() * Math.PI * 2,
+              shimmerOffset: Math.random() * 1000,
+              // Color accent (most are warm white, few have subtle accents)
+              accent: Math.random() < 0.85 ? 0 : (Math.random() < 0.5 ? 1 : 2)
+            });
+          }
+        }
+
+        generateAionTargets() {
+          // Generate target positions for "AION" text using points
+          this.aionTargets = [];
+          
+          const fontSize = Math.min(this.width * 0.12, this.height * 0.08, 80);
+          const letterSpacing = fontSize * 0.85;
+          const totalWidth = letterSpacing * 3.5;
+          const startX = this.centerX - totalWidth / 2;
+          const textY = this.centerY + this.baseSize * 0.55; // Below infinity
+          
+          const letters = ['A', 'I', 'O', 'N'];
+          
+          letters.forEach((letter, idx) => {
+            const letterX = startX + idx * letterSpacing;
+            const points = this.getLetterPoints(letter, letterX, textY, fontSize);
+            this.aionTargets.push(...points);
+          });
+          
+          // Assign targets to particles
+          const aionParticleCount = Math.min(this.aionTargets.length * 3, Math.floor(this.particles.length * 0.35));
+          for (let i = 0; i < this.particles.length; i++) {
+            if (i < aionParticleCount && this.aionTargets.length > 0) {
+              const target = this.aionTargets[i % this.aionTargets.length];
+              this.particles[i].targetX = target.x;
+              this.particles[i].targetY = target.y;
+              this.particles[i].isAion = true;
+            } else {
+              // Floating particles - no fixed target
+              this.particles[i].targetX = null;
+              this.particles[i].targetY = null;
+              this.particles[i].isAion = false;
+            }
+          }
+        }
+
+        getLetterPoints(letter, cx, cy, size) {
+          const points = [];
+          const density = Math.max(8, Math.floor(size / 6));
+          const half = size / 2;
+          
+          switch(letter) {
+            case 'A':
+              // Triangle shape with crossbar
+              for (let i = 0; i < density; i++) {
+                const t = i / density;
+                // Left leg
+                points.push({ x: cx - half + t * half, y: cy + half - t * size });
+                // Right leg
+                points.push({ x: cx + half - t * half, y: cy + half - t * size });
+              }
+              // Crossbar
+              for (let i = 0; i < density * 0.6; i++) {
+                const t = i / (density * 0.6);
+                points.push({ x: cx - half * 0.4 + t * half * 0.8, y: cy + half * 0.1 });
+              }
+              break;
+            case 'I':
+              // Vertical line with serifs
+              for (let i = 0; i < density; i++) {
+                const t = i / density;
+                points.push({ x: cx, y: cy - half + t * size });
+              }
+              // Top serif
+              for (let i = 0; i < density * 0.4; i++) {
+                const t = i / (density * 0.4);
+                points.push({ x: cx - half * 0.3 + t * half * 0.6, y: cy - half });
+              }
+              // Bottom serif
+              for (let i = 0; i < density * 0.4; i++) {
+                const t = i / (density * 0.4);
+                points.push({ x: cx - half * 0.3 + t * half * 0.6, y: cy + half });
+              }
+              break;
+            case 'O':
+              // Circle/ellipse
+              for (let i = 0; i < density * 2; i++) {
+                const angle = (i / (density * 2)) * Math.PI * 2;
+                points.push({ 
+                  x: cx + Math.cos(angle) * half * 0.5, 
+                  y: cy + Math.sin(angle) * half 
+                });
+              }
+              break;
+            case 'N':
+              // Two verticals with diagonal
+              for (let i = 0; i < density; i++) {
+                const t = i / density;
+                // Left vertical
+                points.push({ x: cx - half * 0.4, y: cy - half + t * size });
+                // Right vertical
+                points.push({ x: cx + half * 0.4, y: cy - half + t * size });
+                // Diagonal
+                points.push({ x: cx - half * 0.4 + t * half * 0.8, y: cy - half + t * size });
+              }
+              break;
+          }
+          return points;
+        }
+
+        // Organic noise for wobble effect
+        noise(x, y, t) {
+          return Math.sin(x * 0.01 + t) * Math.cos(y * 0.01 + t * 0.7) * NOISE_AMPLITUDE;
+        }
+
+        // Get point on infinity curve (lemniscate of Bernoulli)
+        getInfinityPoint(t, breathScale) {
+          const a = this.baseSize * 0.45 * breathScale;
+          const denom = 1 + Math.sin(t) * Math.sin(t);
+          const x = a * Math.cos(t) / denom;
+          const y = a * Math.sin(t) * Math.cos(t) / denom;
+          
+          // Add organic noise
+          const nx = this.noise(x, y, this.time * 0.5);
+          const ny = this.noise(y, x, this.time * 0.5 + 100);
+          
+          return {
+            x: this.centerX + x + nx,
+            y: this.centerY + y + ny
+          };
+        }
+
+        getBreathScale() {
+          const phase = (this.time * 1000 / BREATH_PERIOD_MS) * Math.PI * 2;
+          return 1 + Math.sin(phase) * 0.06;
+        }
+
+        render() {
+          // Clear with transparency to show stars behind
+          this.ctx.clearRect(0, 0, this.width, this.height);
+          
+          const breathScale = this.getBreathScale();
+          const breathIntensity = 0.9 + Math.sin((this.time * 1000 / BREATH_PERIOD_MS) * Math.PI * 2) * 0.1;
+          
+          // Draw infinity symbol
+          this.drawInfinity(breathScale, breathIntensity);
+          
+          // Update and draw particles
+          this.updateParticles(breathScale);
+          this.drawParticles(breathIntensity);
+        }
+
+        drawInfinity(breathScale, intensity) {
+          this.ctx.save();
+          
+          // Multiple glow layers
+          for (let glowPass = 0; glowPass < 3; glowPass++) {
+            const alpha = (0.15 - glowPass * 0.04) * intensity * GLOW_INTENSITY;
+            const lineWidth = (3 - glowPass * 0.8) * breathScale;
+            
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = `rgba(${this.warmWhite.r}, ${this.warmWhite.g}, ${this.warmWhite.b}, ${alpha})`;
+            this.ctx.lineWidth = lineWidth;
+            this.ctx.shadowColor = `rgba(${this.warmWhite.r}, ${this.warmWhite.g}, ${this.warmWhite.b}, ${0.5 * GLOW_INTENSITY})`;
+            this.ctx.shadowBlur = 30 + glowPass * 20;
+            
+            // Draw infinity curve
+            for (let t = 0; t <= Math.PI * 4; t += 0.05) {
+              const p = this.getInfinityPoint(t, breathScale);
+              if (t === 0) {
+                this.ctx.moveTo(p.x, p.y);
+              } else {
+                this.ctx.lineTo(p.x, p.y);
+              }
+            }
+            this.ctx.stroke();
+          }
+          
+          // Draw flowing energy particles along the infinity
+          this.ctx.globalCompositeOperation = 'screen';
+          for (let i = 0; i < 60; i++) {
+            const t = ((this.time * 0.3 + i * 0.15) % (Math.PI * 4));
+            const p = this.getInfinityPoint(t, breathScale);
+            const fade = Math.sin((i / 60) * Math.PI) * intensity;
+            
+            this.ctx.beginPath();
+            this.ctx.fillStyle = `rgba(${this.warmWhite.r}, ${this.warmWhite.g}, ${this.warmWhite.b}, ${fade * 0.6 * GLOW_INTENSITY})`;
+            this.ctx.shadowBlur = 15;
+            this.ctx.arc(p.x, p.y, 2 * breathScale, 0, Math.PI * 2);
+            this.ctx.fill();
+          }
+          
+          this.ctx.restore();
+        }
+
+        updateParticles(breathScale) {
+          this.particles.forEach(p => {
+            if (p.isAion && p.targetX !== null) {
+              // Drift toward target with some organic movement
+              const dx = p.targetX - p.x;
+              const dy = p.targetY - p.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              
+              // Attraction force
+              const attraction = 0.02;
+              p.vx += dx * attraction;
+              p.vy += dy * attraction;
+              
+              // Add subtle drift
+              p.vx += Math.sin(this.time + p.phase) * 0.02;
+              p.vy += Math.cos(this.time * 0.7 + p.phase) * 0.02;
+            } else {
+              // Free floating particles
+              p.vx += (Math.random() - 0.5) * 0.05;
+              p.vy += (Math.random() - 0.5) * 0.05;
+              
+              // Gentle drift toward center area
+              const toCenterX = (this.centerX - p.x) * 0.0003;
+              const toCenterY = (this.centerY - p.y) * 0.0003;
+              p.vx += toCenterX;
+              p.vy += toCenterY;
+            }
+            
+            // Friction
+            p.vx *= 0.96;
+            p.vy *= 0.96;
+            
+            // Update position
+            p.x += p.vx;
+            p.y += p.vy;
+            
+            // Wrap around edges
+            if (p.x < -50) p.x = this.width + 50;
+            if (p.x > this.width + 50) p.x = -50;
+            if (p.y < -50) p.y = this.height + 50;
+            if (p.y > this.height + 50) p.y = -50;
+          });
+        }
+
+        drawParticles(intensity) {
+          this.ctx.save();
+          this.ctx.globalCompositeOperation = 'screen';
+          
+          this.particles.forEach(p => {
+            // Shimmer effect
+            const shimmer = Math.sin(this.time * SHIMMER_SPEED * 1000 + p.shimmerOffset) * 0.3 + 0.7;
+            const alpha = p.alpha * shimmer * intensity * GLOW_INTENSITY;
+            
+            // Color based on accent
+            let color;
+            if (p.accent === 0) {
+              color = this.warmWhite;
+            } else if (p.accent === 1) {
+              color = this.accentSilver;
+            } else {
+              color = this.accentIce;
+            }
+            
+            this.ctx.beginPath();
+            this.ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
+            this.ctx.shadowColor = `rgba(${this.warmWhite.r}, ${this.warmWhite.g}, ${this.warmWhite.b}, ${alpha * 0.5})`;
+            this.ctx.shadowBlur = 8;
+            this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            this.ctx.fill();
+          });
+          
+          this.ctx.restore();
+        }
+
+        animate() {
+          this.time += 1/60;
+          
+          // Only render if on layer 1
+          if (document.body.classList.contains('layer-1')) {
+            this.render();
+          }
+          
+          requestAnimationFrame(() => this.animate());
+        }
+      }
+
+      // Initialize AION when page loads
+      const aionCanvas = document.getElementById('aion-canvas');
+      if (aionCanvas) {
+        new AionVisual(aionCanvas);
+        console.log('[AION] Initialized');
+      }
     </script>
   </body>
 </html>

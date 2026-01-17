@@ -1,5 +1,5 @@
 ---
-import '../styles/global.css';
+import '../../styles/global.css';
 import { sql } from '@vercel/postgres';
 export const prerender = false;
 
@@ -23,7 +23,7 @@ try {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Letters</title>
+    <title>Public Letters</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
@@ -32,10 +32,16 @@ try {
     <div class="container mx-auto px-8 py-16 max-w-4xl">
       <!-- Header -->
       <div class="mb-12">
-        <a href="/" class="inline-block mb-8 text-[#F5F2EA] hover:text-white transition-colors duration-300 text-lg">
-          ← Home
-        </a>
-        <h1 class="text-4xl font-light text-[#F5F2EA] font-serif italic mb-4">Letters</h1>
+        <div class="flex items-center space-x-4 mb-8">
+          <a href="/" class="text-[#F5F2EA] hover:text-white transition-colors duration-300 text-lg">
+            ← Home
+          </a>
+          <span class="text-[#F5F2EA]/50">•</span>
+          <a href="/message" class="text-[#F5F2EA] hover:text-white transition-colors duration-300 text-lg">
+            ← Message
+          </a>
+        </div>
+        <h1 class="text-4xl font-light text-[#F5F2EA] font-serif italic mb-4">Public Letters</h1>
       </div>
 
       {error ? (
@@ -56,7 +62,7 @@ try {
             
             return (
               <div class="bg-black border border-[#F5F2EA]/30 rounded-lg p-6 hover:border-[#F5F2EA]/60 transition-colors duration-300">
-                <a href={`/letters/${letter.id}`} class="block group">
+                <a href={`/message/letter/${letter.id}`} class="block group">
                   <div class="flex justify-between items-start mb-3">
                     <h3 class="text-[#F5F2EA] font-serif italic group-hover:text-white transition-colors duration-300">
                       {letter.display_name}
