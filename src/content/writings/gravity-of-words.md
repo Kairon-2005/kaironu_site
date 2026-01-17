@@ -1,21 +1,71 @@
 ---
-title: "The Gravity of Words"
-date: 2025-01-03
-category: "essays"
-summary: "How language shapes the curvature of thought."
+title: "环游世界计划"
+date: 2025-01-18
+category: "record"
+summary: "Countries and provinces I've been to (mostly solo-trip)."
 draft: false
 ---
 
-Words have mass. Not in the physical sense, but in the way they bend the space around them, pulling thoughts into orbit, warping the trajectory of understanding. A single word, chosen precisely, can collapse a paragraph into a point of infinite density.
+## 想去 Top5
+- 台湾
+- 美国
+- 东非
+- 南美
+- 南极
 
-Consider the weight of "home." It carries the scent of familiar rooms, the texture of worn furniture, the echo of voices that shaped who we are. It is not merely a location but a gravitational center around which memory orbits. Some words are so heavy they create their own time dilation—speak them, and the present stretches to accommodate the past.
+## 已去
 
-Writers are not craftsmen of language but astronomers of meaning. We map the constellations of connotation, track the elliptical paths of etymology, and occasionally discover new stars burning in the darkness of the unsaid. Every sentence is a solar system, every paragraph a galaxy spinning slowly through the void of the page.
+### 海外
 
-The gravity of words explains why some phrases stick with us across decades while others evaporate before the sentence ends. Heavy words sink into consciousness and remain there, forming the bedrock upon which we build our understanding of the world. Light words float away, leaving no trace.
+- 日本  
+- 澳大利亚  
+- 新加坡  
 
-There is danger in this metaphor, of course. Words can also collapse into black holes—terms so loaded with meaning that nothing escapes their pull, not nuance, not context, not the original intention of the speaker. We have all witnessed conversations disappear into such linguistic singularities, never to return.
+**欧洲**
+- 法国  
+- 西班牙  
+- 德国  
+- 意大利  
+- 希腊  
+- 奥地利  
+- 瑞士  
+- 捷克  
+- 荷兰  
+- 葡萄牙  
+- 挪威  
+- 比利时  
+- 匈牙利  
 
-The craft of writing is learning to work with this gravity. To place words where they will pull the reader forward, to arrange sentences so thoughts fall naturally into place, to create meaning through the careful orchestration of mass and motion.
+---
 
-In the end, every text is a universe unto itself, governed by the gravity of its words.
+### 中国
+
+- 北京  
+- 上海  
+- 天津  
+- 重庆  
+
+- 河北  
+- 山西  
+- 黑龙江  
+- 江苏  
+- 浙江  
+- 安徽  
+- 福建  
+- 山东  
+- 河南  
+- 湖北  
+- 湖南  
+- 广东  
+- 海南  
+- 四川  
+- 贵州  
+- 云南  
+- 陕西  
+- 甘肃  
+
+- 内蒙古自治区  
+- 宁夏回族自治区  
+- 新疆维吾尔自治区  
+
+- 香港  
