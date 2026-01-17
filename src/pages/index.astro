@@ -9,15 +9,20 @@ import '../styles/global.css';
     <title>∞</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
   </head>
   <body class="bg-black overflow-hidden select-none m-0 p-0">
     <!-- Background elements -->
     <div id="noise" class="fixed inset-0 opacity-5 mix-blend-overlay pointer-events-none"></div>
     <canvas id="stars" class="fixed inset-0 w-full h-full pointer-events-none"></canvas>
     
-    <!-- AION Canvas for Layer 1 -->
-    <canvas id="aion-canvas" class="fixed inset-0 w-full h-full pointer-events-none" style="z-index: 2;"></canvas>
+    <!-- Layer 1 Canvas for Snake/Lemniscate -->
+    <div id="layer1-canvas-container" class="fixed inset-0 w-full h-full pointer-events-none" style="z-index: 2;">
+      <canvas id="layer1-canvas"></canvas>
+    </div>
+    
+    <!-- Runes Layer for Layer 1 -->
+    <div id="runes-layer" class="rune-container"></div>
     
     <!-- Bloom orbs -->
     <div class="bloom-orb bloom-1"></div>
@@ -36,9 +41,18 @@ import '../styles/global.css';
         <div class="layer active" data-layer="1" data-route="/">
           <div class="layer-content">
             <div class="layer-bg layer-bg-void"></div>
-            <!-- AION visual is rendered on the canvas above -->
+            <!-- Background Gradients for Layer 1 -->
+            <div class="layer1-gradients">
+              <div class="layer1-gradient layer1-gradient-tl"></div>
+              <div class="layer1-gradient layer1-gradient-br"></div>
+            </div>
+            <!-- AION Title Content -->
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
-              <!-- Empty - the AION infinity + particles are drawn on canvas -->
+              <div class="layer1-content">
+                <h1 class="layer1-title cinzel" id="main-title">AION</h1>
+                <div class="layer1-divider"></div>
+                <p class="layer1-subtitle">Eternal Moments</p>
+              </div>
             </div>
           </div>
         </div>
@@ -60,10 +74,18 @@ import '../styles/global.css';
         <div class="layer" data-layer="3" data-route="/fragments">
           <div class="layer-content">
             <div class="layer-bg layer-bg-debris"></div>
-            <div class="debris-particles"></div>
+            <!-- Layer 3 Crystalline Sphere Canvas -->
+            <div id="layer3-canvas-container">
+              <canvas id="layer3-canvas"></canvas>
+            </div>
+            <!-- Layer 3 Overlays -->
+            <div class="layer3-noise"></div>
+            <div class="layer3-vignette"></div>
+            <div class="layer3-crt"></div>
+            <!-- Gate Link -->
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
               <a href="/fragments" class="gate-link" data-gate>
-                <span class="gate-text text-6xl md:text-8xl">Fragments</span>
+                <span class="layer3-title cinzel">Fragments</span>
               </a>
             </div>
           </div>
@@ -124,14 +146,180 @@ import '../styles/global.css';
       body.layer-4 .bloom-3 { opacity: 1; }
       body.transitioning .bloom-orb { opacity: 0.3; transform: scale(1.5); }
 
-      /* AION canvas visibility */
-      #aion-canvas {
+      /* Layer 1 canvas visibility */
+      #layer1-canvas-container {
         opacity: 1;
         transition: opacity 0.8s ease;
       }
-      body:not(.layer-1) #aion-canvas {
+      body:not(.layer-1) #layer1-canvas-container {
         opacity: 0;
         pointer-events: none;
+      }
+      
+      #layer1-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Cinzel font family */
+      .cinzel {
+        font-family: 'Cinzel', serif;
+      }
+
+      /* Runes container and animation */
+      .rune-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 3;
+        width: 100%;
+        height: 100%;
+        max-width: 80rem;
+        opacity: 1;
+        transition: opacity 0.8s ease;
+      }
+      body:not(.layer-1) .rune-container {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      @keyframes pulse-rune {
+        0%, 100% { opacity: 0.3; filter: drop-shadow(0 0 2px cyan); }
+        50% { opacity: 0.8; filter: drop-shadow(0 0 8px cyan); }
+      }
+
+      .rune {
+        position: absolute;
+        font-size: 1.2rem;
+        color: rgba(200, 250, 255, 0.6);
+        animation: pulse-rune 4s infinite ease-in-out;
+        font-family: 'Cinzel', serif;
+      }
+
+      /* Layer 1 gradients */
+      .layer1-gradients {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .layer1-gradient {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(120px);
+      }
+      .layer1-gradient-tl {
+        top: -10%;
+        left: -10%;
+        width: 40%;
+        height: 40%;
+        background: rgba(8, 145, 178, 0.1);
+      }
+      .layer1-gradient-br {
+        bottom: -10%;
+        right: -10%;
+        width: 40%;
+        height: 40%;
+        background: rgba(30, 64, 175, 0.1);
+      }
+
+      /* Layer 1 title content */
+      .layer1-content {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .layer1-title {
+        font-size: clamp(3rem, 10vw, 7rem);
+        font-weight: 700;
+        color: #f8fafc;
+        text-shadow: 0 0 20px rgba(165, 243, 252, 0.4), 0 0 40px rgba(165, 243, 252, 0.2);
+        letter-spacing: 0.2em;
+        margin-bottom: 1rem;
+        opacity: 0;
+        transition: opacity 1s ease;
+      }
+      .layer1-title.visible {
+        opacity: 1;
+      }
+
+      /* Layer 3 title - matches Layer 1 AION exactly */
+      .layer3-title {
+        font-size: clamp(3rem, 10vw, 7rem);
+        font-weight: 700;
+        color: #f8fafc;
+        text-shadow: 0 0 20px rgba(165, 243, 252, 0.4), 0 0 40px rgba(165, 243, 252, 0.2);
+        letter-spacing: 0.2em;
+        transition: all 0.6s ease;
+      }
+      .gate-link:hover .layer3-title {
+        text-shadow: 0 0 30px rgba(165, 243, 252, 0.6), 0 0 60px rgba(165, 243, 252, 0.3);
+      }
+
+      .layer1-divider {
+        height: 2px;
+        width: 6rem;
+        background: linear-gradient(to right, transparent, rgba(34, 211, 238, 0.5), transparent);
+        margin: 0 auto 1rem auto;
+      }
+
+      .layer1-subtitle {
+        color: rgba(207, 250, 254, 0.6);
+        font-size: clamp(1rem, 3vw, 1.25rem);
+        letter-spacing: 0.5em;
+        text-transform: uppercase;
+        font-weight: 300;
+        font-family: 'EB Garamond', serif;
+      }
+
+      /* Layer 1 navigation hints */
+      .layer1-nav-hints {
+        position: absolute;
+        bottom: 3rem;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        z-index: 20;
+        opacity: 1;
+        transition: opacity 0.8s ease;
+      }
+      body:not(.layer-1) .layer1-nav-hints {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .layer1-nav-link {
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+        color: rgba(103, 232, 249, 0.3);
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+      .layer1-nav-link:hover {
+        color: rgba(34, 211, 238, 1);
+      }
+
+      /* Grain overlay for Layer 1 */
+      .layer1-grain {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.05;
+        pointer-events: none;
+        z-index: 50;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
       }
 
       /* Gate typography */
@@ -189,20 +377,51 @@ import '../styles/global.css';
         background: linear-gradient(180deg, transparent 48%, rgba(245,242,234,0.01) 50%, transparent 52%);
         pointer-events: none;
       }
-      .debris-particles {
+      /* Layer 3 Canvas Container */
+      #layer3-canvas-container {
         position: absolute;
         inset: 0;
-        background-image:
-          radial-gradient(1px 1px at 20% 30%, rgba(245,242,234,0.15), transparent),
-          radial-gradient(1px 1px at 80% 20%, rgba(245,242,234,0.1), transparent),
-          radial-gradient(1px 1px at 40% 70%, rgba(245,242,234,0.12), transparent),
-          radial-gradient(1px 1px at 60% 50%, rgba(245,242,234,0.08), transparent);
+        z-index: 1;
         pointer-events: none;
-        animation: debris-drift 30s linear infinite;
       }
-      @keyframes debris-drift {
-        0% { transform: translate(0, 0); }
-        100% { transform: translate(-30px, 30px); }
+      #layer3-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Layer 3 Noise Overlay */
+      .layer3-noise {
+        position: absolute;
+        inset: 0;
+        opacity: 0.04;
+        z-index: 2;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      }
+
+      /* Layer 3 Vignette */
+      .layer3-vignette {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 5;
+        box-shadow: inset 0 0 200px rgba(0,0,0,0.9);
+        background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.6) 100%);
+      }
+
+      /* Layer 3 CRT Scanline Effect */
+      .layer3-crt {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 10;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                    linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+        background-size: 100% 4px, 3px 100%;
+        mix-blend-mode: overlay;
       }
       .beacon-rays {
         position: absolute;
@@ -785,363 +1004,586 @@ import '../styles/global.css';
       console.log('[PORTAL] Initialized');
     </script>
 
-    <!-- ============ AION INFINITY + PARTICLE TEXT SYSTEM ============ -->
+    <!-- ============ LAYER 1 LEMNISCATE SNAKE + PARTICLES SYSTEM ============ -->
     <script>
       /**
-       * AION - Animated Infinity Symbol with Particle Text
-       * 
-       * Tuning Constants:
+       * Layer 1 Visual - Lemniscate Snake with Particles and Runes
        */
-      const INFINITY_SCALE = 0.65;           // Scale relative to min(viewportW, viewportH)
-      const PARTICLE_COUNT_DESKTOP = 1100;   // Particle count for desktop
-      const PARTICLE_COUNT_MOBILE = 500;     // Particle count for mobile (< 768px)
-      const GLOW_INTENSITY = 0.8;            // Glow strength (0-1)
-      const BREATH_PERIOD_MS = 14000;        // Breathing cycle in ms (10-20s)
-      const NOISE_AMPLITUDE = 8;             // Organic wobble amount
-      const SHIMMER_SPEED = 0.002;           // Particle shimmer rate
+      (function() {
+        const canvas = document.getElementById('layer1-canvas');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const runesLayer = document.getElementById('runes-layer');
+        const title = document.getElementById('main-title');
 
-      class AionVisual {
-        constructor(canvas) {
-          this.canvas = canvas;
-          this.ctx = canvas.getContext('2d');
-          this.dpr = Math.min(window.devicePixelRatio || 1, 2);
-          this.time = 0;
-          this.particles = [];
-          this.infinityPoints = [];
-          this.aionTargets = [];
-          
-          // Colors
-          this.warmWhite = { r: 245, g: 242, b: 234 };
-          this.accentSilver = { r: 200, g: 210, b: 220 };
-          this.accentGold = { r: 255, g: 240, b: 200 };
-          this.accentIce = { r: 220, g: 240, b: 255 };
-          
-          this.resize();
-          this.initParticles();
-          this.generateAionTargets();
-          this.animate();
-          
-          window.addEventListener('resize', () => this.resize());
+        let width, height;
+        let particles = [];
+        let mouse = { x: 0, y: 0, active: false };
+        let time = 0;
+
+        // Lemniscate parameters
+        const snakeLength = 80;
+        const segments = [];
+
+        const RUNE_CHARS = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚻ', 'ᛁ', 'ᛃ', 'ᛈ', 'ᛉ', 'ᛊ', 'ᛋ', 'ᛏ', 'ᛒ', 'ᛖ', 'ᛗ', 'ᛚ', 'ᛜ', 'ᛟ', 'ᛞ', '𐎀', '𐎁', '𐎂', '𐎃', '𐎄', '𐎅'];
+
+        function init() {
+          resize();
+          window.addEventListener('resize', resize);
+          window.addEventListener('mousemove', function(e) {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            mouse.active = true;
+          });
+
+          // Initialize snake segments
+          for (let i = 0; i < snakeLength; i++) {
+            segments.push({ x: 0, y: 0 });
+          }
+
+          // Generate particles
+          const particleCount = window.innerWidth < 768 ? 100 : 200;
+          for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+          }
+
+          // Generate runes along the path
+          createRunes();
+
+          setTimeout(function() {
+            if (title) title.classList.add('visible');
+          }, 500);
+
+          animate();
         }
 
-        resize() {
-          const w = window.innerWidth;
-          const h = window.innerHeight;
-          this.width = w;
-          this.height = h;
-          this.canvas.width = w * this.dpr;
-          this.canvas.height = h * this.dpr;
-          this.canvas.style.width = w + 'px';
-          this.canvas.style.height = h + 'px';
-          this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-          
-          this.centerX = w / 2;
-          this.centerY = h / 2;
-          this.baseSize = Math.min(w, h) * INFINITY_SCALE;
-          
-          // Regenerate targets on resize
-          this.generateAionTargets();
+        function resize() {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+          createRunes();
         }
 
-        initParticles() {
-          const isMobile = window.innerWidth < 768;
-          const count = isMobile ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT_DESKTOP;
+        // Bernoulli Lemniscate Equation
+        function getLemniscatePoint(t, a) {
+          const denom = 1 + Math.pow(Math.sin(t), 2);
+          return {
+            x: (a * Math.cos(t)) / denom + (width / 2),
+            y: (a * Math.sin(t) * Math.cos(t)) / denom + (height / 2)
+          };
+        }
+
+        function createRunes() {
+          if (!runesLayer) return;
+          runesLayer.innerHTML = '';
+          const runeCount = 32;
+          const a = Math.min(width, height) * 0.38;
           
-          this.particles = [];
-          for (let i = 0; i < count; i++) {
-            this.particles.push({
-              x: Math.random() * this.width,
-              y: Math.random() * this.height,
-              vx: (Math.random() - 0.5) * 0.5,
-              vy: (Math.random() - 0.5) * 0.5,
-              targetX: 0,
-              targetY: 0,
-              size: Math.random() * 1.5 + 0.5,
-              alpha: Math.random() * 0.5 + 0.3,
-              phase: Math.random() * Math.PI * 2,
-              shimmerOffset: Math.random() * 1000,
-              // Color accent (most are warm white, few have subtle accents)
-              accent: Math.random() < 0.85 ? 0 : (Math.random() < 0.5 ? 1 : 2)
+          for (let i = 0; i < runeCount; i++) {
+            const t = (i / runeCount) * Math.PI * 2;
+            const pos = getLemniscatePoint(t, a * 1.2);
+            
+            const rune = document.createElement('div');
+            rune.className = 'rune cinzel';
+            rune.innerText = RUNE_CHARS[Math.floor(Math.random() * RUNE_CHARS.length)];
+            rune.style.left = pos.x + 'px';
+            rune.style.top = pos.y + 'px';
+            rune.style.animationDelay = (Math.random() * 5) + 's';
+            rune.style.fontSize = (Math.random() * 10 + 15) + 'px';
+            runesLayer.appendChild(rune);
+          }
+        }
+
+        function Particle() {
+          this.reset();
+        }
+        
+        Particle.prototype.reset = function() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.5;
+          this.vy = (Math.random() - 0.5) * 0.5;
+          this.size = Math.random() * 2;
+          this.alpha = Math.random() * 0.5;
+        };
+        
+        Particle.prototype.update = function() {
+          this.x += this.vx;
+          this.y += this.vy;
+          if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
+
+          // Interaction with mouse
+          if (mouse.active) {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 150) {
+              this.x -= dx * 0.01;
+              this.y -= dy * 0.01;
+            }
+          }
+        };
+        
+        Particle.prototype.draw = function() {
+          ctx.fillStyle = 'rgba(165, 243, 252, ' + this.alpha + ')';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        };
+
+        function animate() {
+          // Only render if on layer 1
+          if (!document.body.classList.contains('layer-1')) {
+            requestAnimationFrame(animate);
+            return;
+          }
+          
+          ctx.clearRect(0, 0, width, height);
+          time += 0.008;
+
+          const a = Math.min(width, height) * 0.38;
+
+          // 1. Draw Static Path (Glow)
+          const pathRes = 100;
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(6, 182, 212, 0.05)';
+          ctx.lineWidth = 40;
+          for (let i = 0; i <= pathRes; i++) {
+            const t = (i / pathRes) * Math.PI * 2;
+            const p = getLemniscatePoint(t, a);
+            if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+          }
+          ctx.stroke();
+
+          // 2. Update and Draw Snake
+          const headPos = getLemniscatePoint(time, a);
+          segments[0] = headPos;
+
+          for (let i = 1; i < snakeLength; i++) {
+            const prev = segments[i - 1];
+            const curr = segments[i];
+            curr.x += (prev.x - curr.x) * 0.35;
+            curr.y += (prev.y - curr.y) * 0.35;
+          }
+
+          // Draw Body with Stardust Effect
+          for (let i = snakeLength - 1; i >= 0; i--) {
+            const s = segments[i];
+            const size = (1 - i / snakeLength) * 12 + 2;
+            const opacity = (1 - i / snakeLength) * 0.8;
+            
+            if (i > 0) {
+              ctx.beginPath();
+              ctx.strokeStyle = 'rgba(200, 255, 255, ' + (opacity * 0.4) + ')';
+              ctx.lineWidth = size;
+              ctx.lineCap = 'round';
+              ctx.moveTo(segments[i-1].x, segments[i-1].y);
+              ctx.lineTo(s.x, s.y);
+              ctx.stroke();
+            }
+
+            // Sparkle clusters on body
+            if (i % 3 === 0) {
+              const sparkCount = Math.floor(size / 3);
+              for (let j = 0; j < sparkCount; j++) {
+                const ox = (Math.random() - 0.5) * size * 1.5;
+                const oy = (Math.random() - 0.5) * size * 1.5;
+                ctx.fillStyle = 'rgba(255, 255, 255, ' + (Math.random() * opacity) + ')';
+                ctx.beginPath();
+                ctx.arc(s.x + ox, s.y + oy, Math.random() * 1.5, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            }
+          }
+
+          // Head highlight
+          ctx.shadowBlur = 25;
+          ctx.shadowColor = 'cyan';
+          ctx.fillStyle = '#fff';
+          ctx.beginPath();
+          ctx.arc(segments[0].x, segments[0].y, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          // 3. Draw Ambient Particles
+          particles.forEach(function(p) {
+            p.update();
+            p.draw();
+          });
+
+          requestAnimationFrame(animate);
+        }
+
+        init();
+        console.log('[LAYER1] Lemniscate visual initialized');
+      })();
+    </script>
+
+    <!-- ============ LAYER 3 CRYSTALLINE SPHERE SYSTEM ============ -->
+    <script>
+      /**
+       * Layer 3 Visual - Crystalline Sphere with Shards
+       * Only runs when Layer 3 is active, pauses otherwise
+       */
+      (function() {
+        const canvas = document.getElementById('layer3-canvas');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let mouse = { x: -1000, y: -1000, active: false };
+        let animationId = null;
+        let isActive = false;
+        let sphere = null;
+        let stars = [];
+        
+        // Cap DPR for performance
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+
+        function resize() {
+          width = window.innerWidth;
+          height = window.innerHeight;
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          canvas.style.width = width + 'px';
+          canvas.style.height = height + 'px';
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          
+          // Reinitialize sphere position on resize
+          if (sphere) {
+            sphere.x = width / 2;
+            sphere.y = height / 2;
+          }
+        }
+
+        function handleMouseMove(e) {
+          mouse.x = e.clientX;
+          mouse.y = e.clientY;
+          mouse.active = true;
+        }
+
+        // Star class for background
+        function Star() {
+          this.reset();
+        }
+        Star.prototype.reset = function() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.size = Math.random() * 2;
+          this.speed = Math.random() * 0.15 + 0.05;
+          this.opacity = Math.random();
+        };
+        Star.prototype.update = function() {
+          this.y -= this.speed;
+          if (this.y < 0) {
+            this.y = height;
+            this.x = Math.random() * width;
+          }
+        };
+        Star.prototype.draw = function() {
+          ctx.fillStyle = 'rgba(255, 255, 255, ' + this.opacity + ')';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        };
+
+        // Shard class for falling fragments
+        function Shard(x, y, vx, vy, color) {
+          this.x = x;
+          this.y = y;
+          this.vx = vx || (Math.random() - 0.5) * 4;
+          this.vy = vy || (Math.random() * 5 + 2);
+          this.size = Math.random() * 6 + 3;
+          this.rotation = Math.random() * Math.PI * 2;
+          this.rotSpeed = (Math.random() - 0.5) * 0.2;
+          this.life = 1.0;
+          this.decay = Math.random() * 0.02 + 0.005;
+          this.color = color || (Math.random() > 0.4 ? '#22d3ee' : '#ffffff');
+          this.history = [];
+        }
+        Shard.prototype.update = function() {
+          this.history.unshift({x: this.x, y: this.y});
+          if (this.history.length > 5) this.history.pop();
+          
+          this.x += this.vx;
+          this.y += this.vy;
+          this.vy += 0.05;
+          this.rotation += this.rotSpeed;
+          this.life -= this.decay;
+        };
+        Shard.prototype.draw = function() {
+          if (this.life <= 0) return;
+          
+          // Draw trail
+          ctx.beginPath();
+          ctx.strokeStyle = this.color;
+          ctx.globalAlpha = this.life * 0.3;
+          ctx.lineWidth = 1;
+          for (var i = 0; i < this.history.length; i++) {
+            var p = this.history[i];
+            if (i === 0) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+          }
+          ctx.stroke();
+
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.rotation);
+          ctx.globalAlpha = this.life;
+          ctx.strokeStyle = this.color;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(-this.size, 0);
+          ctx.lineTo(0, -this.size * 1.5);
+          ctx.lineTo(this.size, 0);
+          ctx.lineTo(0, this.size * 0.5);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.restore();
+          ctx.globalAlpha = 1;
+        };
+
+        // Crystal Sphere class
+        function CrystalSphere() {
+          this.x = width / 2;
+          this.y = height / 2;
+          this.radius = Math.min(width, height) * 0.1;
+          this.radius = Math.max(60, Math.min(this.radius, 100));
+          this.history = [];
+          this.shards = [];
+          this.rotation = 0;
+          this.rotSpeed = 0.02;
+          this.lerpSpeed = 0.15;
+          
+          // Pre-generate facets
+          this.facets = [];
+          var count = 12;
+          for (var i = 0; i < count; i++) {
+            var angle = (i / count) * Math.PI * 2;
+            var innerRadius = this.radius * (0.4 + Math.random() * 0.6);
+            this.facets.push({
+              angle: angle,
+              innerRadius: innerRadius,
+              color: Math.random() > 0.5 ? '#ffffff' : '#22d3ee'
             });
           }
         }
 
-        generateAionTargets() {
-          // Generate target positions for "AION" text using points
-          this.aionTargets = [];
+        CrystalSphere.prototype.update = function() {
+          var targetX = mouse.active ? mouse.x : (width/2 + Math.cos(Date.now() * 0.001) * 150);
+          var targetY = mouse.active ? mouse.y : (height/2 + Math.sin(Date.now() * 0.001) * 100);
           
-          const fontSize = Math.min(this.width * 0.12, this.height * 0.08, 80);
-          const letterSpacing = fontSize * 0.85;
-          const totalWidth = letterSpacing * 3.5;
-          const startX = this.centerX - totalWidth / 2;
-          const textY = this.centerY + this.baseSize * 0.55; // Below infinity
+          this.history.unshift({x: this.x, y: this.y, rotation: this.rotation});
+          if (this.history.length > 10) this.history.pop();
+
+          var dx = targetX - this.x;
+          var dy = targetY - this.y;
+          this.x += dx * this.lerpSpeed;
+          this.y += dy * this.lerpSpeed;
+          this.rotation += this.rotSpeed + (Math.hypot(dx, dy) * 0.0005);
+
+          // Falling fragments (reduced rate for performance)
+          if (Math.random() < 0.15) {
+            var angle = Math.random() * Math.PI * 2;
+            var px = this.x + Math.cos(angle) * this.radius * 0.5;
+            var py = this.y + Math.sin(angle) * this.radius * 0.5;
+            this.shards.push(new Shard(px, py));
+          }
+
+          // Fast movement burst
+          if (Math.hypot(dx, dy) > 20 && Math.random() < 0.3) {
+            this.shards.push(new Shard(
+              this.x, 
+              this.y, 
+              (Math.random()-0.5) * 10, 
+              (Math.random()-0.5) * 10
+            ));
+          }
+
+          // Update and clean up shards (limit count for performance)
+          var maxShards = window.innerWidth < 768 ? 30 : 60;
+          for (var i = this.shards.length - 1; i >= 0; i--) {
+            this.shards[i].update();
+            if (this.shards[i].life <= 0) {
+              this.shards.splice(i, 1);
+            }
+          }
+          while (this.shards.length > maxShards) {
+            this.shards.shift();
+          }
+        };
+
+        CrystalSphere.prototype.drawSphere = function(x, y, rot, alpha, chromaticShift) {
+          chromaticShift = chromaticShift || 0;
+          var self = this;
           
-          const letters = ['A', 'I', 'O', 'N'];
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(rot);
+          ctx.globalAlpha = alpha;
           
-          letters.forEach((letter, idx) => {
-            const letterX = startX + idx * letterSpacing;
-            const points = this.getLetterPoints(letter, letterX, textY, fontSize);
-            this.aionTargets.push(...points);
+          ctx.shadowBlur = 40 * alpha;
+          ctx.shadowColor = 'rgba(34, 211, 238, 0.8)';
+
+          // Base Glow
+          ctx.beginPath();
+          ctx.arc(0, 0, this.radius * 0.8, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(34, 211, 238, ' + (0.1 * alpha) + ')';
+          ctx.fill();
+
+          // Draw Facets
+          for (var i = 0; i < this.facets.length; i++) {
+            var f = this.facets[i];
+            var nextF = this.facets[(i + 1) % this.facets.length];
+            
+            // Chromatic aberration for afterimages
+            if (chromaticShift > 0) {
+              ctx.strokeStyle = '#ff0055';
+              this.renderFacet(f, nextF, chromaticShift);
+              ctx.strokeStyle = '#00ffaa';
+              this.renderFacet(f, nextF, -chromaticShift);
+            }
+
+            ctx.strokeStyle = f.color;
+            ctx.lineWidth = 1;
+            this.renderFacet(f, nextF, 0);
+          }
+
+          // Central core cross
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-10, 0); ctx.lineTo(10, 0);
+          ctx.moveTo(0, -10); ctx.lineTo(0, 10);
+          ctx.stroke();
+
+          ctx.restore();
+        };
+
+        CrystalSphere.prototype.renderFacet = function(f, nextF, shift) {
+          ctx.beginPath();
+          var x1 = Math.cos(f.angle) * this.radius + shift;
+          var y1 = Math.sin(f.angle) * this.radius;
+          var x2 = Math.cos(nextF.angle) * this.radius + shift;
+          var y2 = Math.sin(nextF.angle) * this.radius;
+          
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.lineTo(0, 0);
+          ctx.closePath();
+          ctx.stroke();
+        };
+
+        CrystalSphere.prototype.draw = function() {
+          // Draw shards
+          for (var i = 0; i < this.shards.length; i++) {
+            this.shards[i].draw();
+          }
+
+          // Draw afterimages
+          for (var j = 0; j < this.history.length; j++) {
+            var pos = this.history[j];
+            var opacity = (1 - (j / this.history.length)) * 0.3;
+            this.drawSphere(pos.x, pos.y, pos.rotation, opacity, j * 2);
+          }
+
+          // Draw current core
+          this.drawSphere(this.x, this.y, this.rotation, 1.0, 0);
+        };
+
+        function init() {
+          resize();
+          
+          // Create stars (reduced count on mobile)
+          var starCount = window.innerWidth < 768 ? 80 : 150;
+          stars = [];
+          for (var i = 0; i < starCount; i++) {
+            stars.push(new Star());
+          }
+          
+          sphere = new CrystalSphere();
+        }
+
+        function animate() {
+          if (!isActive) {
+            animationId = null;
+            return;
+          }
+          
+          // Semi-transparent clear for trail effect (matches reference: rgba(2, 6, 23, 0.15))
+          ctx.fillStyle = 'rgba(2, 6, 23, 0.15)';
+          ctx.fillRect(0, 0, width, height);
+          
+          // Cosmic depth gradient (matches reference)
+          var grad = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
+          grad.addColorStop(0, 'rgba(15, 23, 42, 0.2)');
+          grad.addColorStop(1, 'transparent');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, width, height);
+
+          // Update and draw stars
+          for (var i = 0; i < stars.length; i++) {
+            stars[i].update();
+            stars[i].draw();
+          }
+
+          // Update and draw sphere
+          sphere.update();
+          sphere.draw();
+
+          animationId = requestAnimationFrame(animate);
+        }
+
+        function start() {
+          if (isActive) return;
+          isActive = true;
+          window.addEventListener('resize', resize);
+          window.addEventListener('mousemove', handleMouseMove);
+          init();
+          animate();
+          console.log('[LAYER3] Crystalline sphere started');
+        }
+
+        function stop() {
+          isActive = false;
+          window.removeEventListener('resize', resize);
+          window.removeEventListener('mousemove', handleMouseMove);
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+          }
+          // Clear canvas
+          ctx.clearRect(0, 0, width, height);
+          console.log('[LAYER3] Crystalline sphere stopped');
+        }
+
+        // Watch for layer changes
+        function checkLayer() {
+          var isLayer3 = document.body.classList.contains('layer-3');
+          if (isLayer3 && !isActive) {
+            start();
+          } else if (!isLayer3 && isActive) {
+            stop();
+          }
+        }
+
+        // Use MutationObserver to watch body class changes
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+              checkLayer();
+            }
           });
-          
-          // Assign targets to particles
-          const aionParticleCount = Math.min(this.aionTargets.length * 3, Math.floor(this.particles.length * 0.35));
-          for (let i = 0; i < this.particles.length; i++) {
-            if (i < aionParticleCount && this.aionTargets.length > 0) {
-              const target = this.aionTargets[i % this.aionTargets.length];
-              this.particles[i].targetX = target.x;
-              this.particles[i].targetY = target.y;
-              this.particles[i].isAion = true;
-            } else {
-              // Floating particles - no fixed target
-              this.particles[i].targetX = null;
-              this.particles[i].targetY = null;
-              this.particles[i].isAion = false;
-            }
-          }
-        }
-
-        getLetterPoints(letter, cx, cy, size) {
-          const points = [];
-          const density = Math.max(8, Math.floor(size / 6));
-          const half = size / 2;
-          
-          switch(letter) {
-            case 'A':
-              // Triangle shape with crossbar
-              for (let i = 0; i < density; i++) {
-                const t = i / density;
-                // Left leg
-                points.push({ x: cx - half + t * half, y: cy + half - t * size });
-                // Right leg
-                points.push({ x: cx + half - t * half, y: cy + half - t * size });
-              }
-              // Crossbar
-              for (let i = 0; i < density * 0.6; i++) {
-                const t = i / (density * 0.6);
-                points.push({ x: cx - half * 0.4 + t * half * 0.8, y: cy + half * 0.1 });
-              }
-              break;
-            case 'I':
-              // Vertical line with serifs
-              for (let i = 0; i < density; i++) {
-                const t = i / density;
-                points.push({ x: cx, y: cy - half + t * size });
-              }
-              // Top serif
-              for (let i = 0; i < density * 0.4; i++) {
-                const t = i / (density * 0.4);
-                points.push({ x: cx - half * 0.3 + t * half * 0.6, y: cy - half });
-              }
-              // Bottom serif
-              for (let i = 0; i < density * 0.4; i++) {
-                const t = i / (density * 0.4);
-                points.push({ x: cx - half * 0.3 + t * half * 0.6, y: cy + half });
-              }
-              break;
-            case 'O':
-              // Circle/ellipse
-              for (let i = 0; i < density * 2; i++) {
-                const angle = (i / (density * 2)) * Math.PI * 2;
-                points.push({ 
-                  x: cx + Math.cos(angle) * half * 0.5, 
-                  y: cy + Math.sin(angle) * half 
-                });
-              }
-              break;
-            case 'N':
-              // Two verticals with diagonal
-              for (let i = 0; i < density; i++) {
-                const t = i / density;
-                // Left vertical
-                points.push({ x: cx - half * 0.4, y: cy - half + t * size });
-                // Right vertical
-                points.push({ x: cx + half * 0.4, y: cy - half + t * size });
-                // Diagonal
-                points.push({ x: cx - half * 0.4 + t * half * 0.8, y: cy - half + t * size });
-              }
-              break;
-          }
-          return points;
-        }
-
-        // Organic noise for wobble effect
-        noise(x, y, t) {
-          return Math.sin(x * 0.01 + t) * Math.cos(y * 0.01 + t * 0.7) * NOISE_AMPLITUDE;
-        }
-
-        // Get point on infinity curve (lemniscate of Bernoulli)
-        getInfinityPoint(t, breathScale) {
-          const a = this.baseSize * 0.45 * breathScale;
-          const denom = 1 + Math.sin(t) * Math.sin(t);
-          const x = a * Math.cos(t) / denom;
-          const y = a * Math.sin(t) * Math.cos(t) / denom;
-          
-          // Add organic noise
-          const nx = this.noise(x, y, this.time * 0.5);
-          const ny = this.noise(y, x, this.time * 0.5 + 100);
-          
-          return {
-            x: this.centerX + x + nx,
-            y: this.centerY + y + ny
-          };
-        }
-
-        getBreathScale() {
-          const phase = (this.time * 1000 / BREATH_PERIOD_MS) * Math.PI * 2;
-          return 1 + Math.sin(phase) * 0.06;
-        }
-
-        render() {
-          // Clear with transparency to show stars behind
-          this.ctx.clearRect(0, 0, this.width, this.height);
-          
-          const breathScale = this.getBreathScale();
-          const breathIntensity = 0.9 + Math.sin((this.time * 1000 / BREATH_PERIOD_MS) * Math.PI * 2) * 0.1;
-          
-          // Draw infinity symbol
-          this.drawInfinity(breathScale, breathIntensity);
-          
-          // Update and draw particles
-          this.updateParticles(breathScale);
-          this.drawParticles(breathIntensity);
-        }
-
-        drawInfinity(breathScale, intensity) {
-          this.ctx.save();
-          
-          // Multiple glow layers
-          for (let glowPass = 0; glowPass < 3; glowPass++) {
-            const alpha = (0.15 - glowPass * 0.04) * intensity * GLOW_INTENSITY;
-            const lineWidth = (3 - glowPass * 0.8) * breathScale;
-            
-            this.ctx.beginPath();
-            this.ctx.strokeStyle = `rgba(${this.warmWhite.r}, ${this.warmWhite.g}, ${this.warmWhite.b}, ${alpha})`;
-            this.ctx.lineWidth = lineWidth;
-            this.ctx.shadowColor = `rgba(${this.warmWhite.r}, ${this.warmWhite.g}, ${this.warmWhite.b}, ${0.5 * GLOW_INTENSITY})`;
-            this.ctx.shadowBlur = 30 + glowPass * 20;
-            
-            // Draw infinity curve
-            for (let t = 0; t <= Math.PI * 4; t += 0.05) {
-              const p = this.getInfinityPoint(t, breathScale);
-              if (t === 0) {
-                this.ctx.moveTo(p.x, p.y);
-              } else {
-                this.ctx.lineTo(p.x, p.y);
-              }
-            }
-            this.ctx.stroke();
-          }
-          
-          // Draw flowing energy particles along the infinity
-          this.ctx.globalCompositeOperation = 'screen';
-          for (let i = 0; i < 60; i++) {
-            const t = ((this.time * 0.3 + i * 0.15) % (Math.PI * 4));
-            const p = this.getInfinityPoint(t, breathScale);
-            const fade = Math.sin((i / 60) * Math.PI) * intensity;
-            
-            this.ctx.beginPath();
-            this.ctx.fillStyle = `rgba(${this.warmWhite.r}, ${this.warmWhite.g}, ${this.warmWhite.b}, ${fade * 0.6 * GLOW_INTENSITY})`;
-            this.ctx.shadowBlur = 15;
-            this.ctx.arc(p.x, p.y, 2 * breathScale, 0, Math.PI * 2);
-            this.ctx.fill();
-          }
-          
-          this.ctx.restore();
-        }
-
-        updateParticles(breathScale) {
-          this.particles.forEach(p => {
-            if (p.isAion && p.targetX !== null) {
-              // Drift toward target with some organic movement
-              const dx = p.targetX - p.x;
-              const dy = p.targetY - p.y;
-              const dist = Math.sqrt(dx * dx + dy * dy);
-              
-              // Attraction force
-              const attraction = 0.02;
-              p.vx += dx * attraction;
-              p.vy += dy * attraction;
-              
-              // Add subtle drift
-              p.vx += Math.sin(this.time + p.phase) * 0.02;
-              p.vy += Math.cos(this.time * 0.7 + p.phase) * 0.02;
-            } else {
-              // Free floating particles
-              p.vx += (Math.random() - 0.5) * 0.05;
-              p.vy += (Math.random() - 0.5) * 0.05;
-              
-              // Gentle drift toward center area
-              const toCenterX = (this.centerX - p.x) * 0.0003;
-              const toCenterY = (this.centerY - p.y) * 0.0003;
-              p.vx += toCenterX;
-              p.vy += toCenterY;
-            }
-            
-            // Friction
-            p.vx *= 0.96;
-            p.vy *= 0.96;
-            
-            // Update position
-            p.x += p.vx;
-            p.y += p.vy;
-            
-            // Wrap around edges
-            if (p.x < -50) p.x = this.width + 50;
-            if (p.x > this.width + 50) p.x = -50;
-            if (p.y < -50) p.y = this.height + 50;
-            if (p.y > this.height + 50) p.y = -50;
-          });
-        }
-
-        drawParticles(intensity) {
-          this.ctx.save();
-          this.ctx.globalCompositeOperation = 'screen';
-          
-          this.particles.forEach(p => {
-            // Shimmer effect
-            const shimmer = Math.sin(this.time * SHIMMER_SPEED * 1000 + p.shimmerOffset) * 0.3 + 0.7;
-            const alpha = p.alpha * shimmer * intensity * GLOW_INTENSITY;
-            
-            // Color based on accent
-            let color;
-            if (p.accent === 0) {
-              color = this.warmWhite;
-            } else if (p.accent === 1) {
-              color = this.accentSilver;
-            } else {
-              color = this.accentIce;
-            }
-            
-            this.ctx.beginPath();
-            this.ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
-            this.ctx.shadowColor = `rgba(${this.warmWhite.r}, ${this.warmWhite.g}, ${this.warmWhite.b}, ${alpha * 0.5})`;
-            this.ctx.shadowBlur = 8;
-            this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            this.ctx.fill();
-          });
-          
-          this.ctx.restore();
-        }
-
-        animate() {
-          this.time += 1/60;
-          
-          // Only render if on layer 1
-          if (document.body.classList.contains('layer-1')) {
-            this.render();
-          }
-          
-          requestAnimationFrame(() => this.animate());
-        }
-      }
-
-      // Initialize AION when page loads
-      const aionCanvas = document.getElementById('aion-canvas');
-      if (aionCanvas) {
-        new AionVisual(aionCanvas);
-        console.log('[AION] Initialized');
-      }
+        });
+        
+        observer.observe(document.body, { attributes: true });
+        
+        // Initial check
+        checkLayer();
+        
+        console.log('[LAYER3] Crystalline sphere system initialized');
+      })();
     </script>
   </body>
 </html>
