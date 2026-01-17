@@ -1,5 +1,15 @@
 ---
 import '../styles/global.css';
+import fragments from '../data/fragments.json';
+
+interface Fragment {
+  text: string;
+  source?: string;
+  date?: string;
+  tags?: string[];
+}
+
+const typedFragments = fragments as Fragment[];
 ---
 
 <html lang="en">
@@ -9,6 +19,92 @@ import '../styles/global.css';
     <title>Fragments</title>
   </head>
   <body class="bg-black text-white min-h-screen">
-    <h1 class="text-4xl font-bold p-8">Fragments</h1>
+    <div class="max-w-6xl mx-auto px-8 py-12">
+      <h1 class="text-4xl font-bold mb-12">Fragments</h1>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {typedFragments.map((fragment, index) => (
+          <button
+            class="fragment-card text-left p-6 border border-gray-800 rounded-lg transition-all duration-200 hover:scale-[1.02] hover:border-gray-600 hover:bg-gray-900/50 cursor-pointer"
+            data-index={index}
+          >
+            <p class="text-gray-300 line-clamp-3">{fragment.text}</p>
+            {fragment.source && (
+              <p class="text-gray-600 text-sm mt-3">— {fragment.source}</p>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div id="modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden items-center justify-center z-50 p-8">
+      <div class="bg-gray-950 border border-gray-800 rounded-xl max-w-xl w-full p-8 relative">
+        <button id="modal-close" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl leading-none">&times;</button>
+        <p id="modal-text" class="text-xl text-gray-200 leading-relaxed mb-6"></p>
+        <p id="modal-source" class="text-gray-500 text-sm"></p>
+        <div id="modal-tags" class="mt-4 flex flex-wrap gap-2"></div>
+      </div>
+    </div>
+
+    <script define:vars={{ fragments: typedFragments }}>
+      const modal = document.getElementById('modal');
+      const modalText = document.getElementById('modal-text');
+      const modalSource = document.getElementById('modal-source');
+      const modalTags = document.getElementById('modal-tags');
+      const modalClose = document.getElementById('modal-close');
+      const cards = document.querySelectorAll('.fragment-card');
+
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          const index = parseInt(card.dataset.index);
+          const fragment = fragments[index];
+
+          modalText.textContent = fragment.text;
+          modalSource.textContent = fragment.source ? `— ${fragment.source}` : '';
+
+          modalTags.innerHTML = '';
+          if (fragment.tags && fragment.tags.length > 0) {
+            fragment.tags.forEach(tag => {
+              const span = document.createElement('span');
+              span.className = 'text-xs px-2 py-1 bg-gray-800 text-gray-400 rounded';
+              span.textContent = tag;
+              modalTags.appendChild(span);
+            });
+          }
+
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        });
+      });
+
+      modalClose.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      });
+    </script>
+
+    <style>
+      .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    </style>
   </body>
 </html>

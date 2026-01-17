@@ -1,0 +1,74 @@
+[
+  {
+    "text": "The best code is the code you don't write.",
+    "source": "Programming wisdom",
+    "date": "2025-01-15",
+    "tags": ["code", "simplicity"]
+  },
+  {
+    "text": "We are the universe experiencing itself.",
+    "source": "Carl Sagan",
+    "date": "2025-01-14",
+    "tags": ["cosmos", "philosophy"]
+  },
+  {
+    "text": "Every exit is an entry somewhere else.",
+    "source": "Tom Stoppard",
+    "date": "2025-01-12",
+    "tags": ["transitions", "perspective"]
+  },
+  {
+    "text": "The only way out is through.",
+    "source": "Robert Frost",
+    "date": "2025-01-10",
+    "tags": ["perseverance"]
+  },
+  {
+    "text": "In the middle of difficulty lies opportunity.",
+    "source": "Albert Einstein",
+    "date": "2025-01-08",
+    "tags": ["opportunity", "challenge"]
+  },
+  {
+    "text": "Reality is merely an illusion, albeit a very persistent one.",
+    "source": "Albert Einstein",
+    "date": "2025-01-05",
+    "tags": ["reality", "perception"]
+  },
+  {
+    "text": "The map is not the territory.",
+    "source": "Alfred Korzybski",
+    "date": "2025-01-03",
+    "tags": ["abstraction", "models"]
+  },
+  {
+    "text": "Simplicity is the ultimate sophistication.",
+    "source": "Leonardo da Vinci",
+    "date": "2024-12-28",
+    "tags": ["design", "simplicity"]
+  },
+  {
+    "text": "Time flies like an arrow; fruit flies like a banana.",
+    "source": "Groucho Marx",
+    "date": "2024-12-20",
+    "tags": ["humor", "language"]
+  },
+  {
+    "text": "The future is already here — it's just not evenly distributed.",
+    "source": "William Gibson",
+    "date": "2024-12-15",
+    "tags": ["future", "technology"]
+  },
+  {
+    "text": "We shape our tools, and thereafter our tools shape us.",
+    "source": "Marshall McLuhan",
+    "date": "2024-12-10",
+    "tags": ["technology", "humanity"]
+  },
+  {
+    "text": "Not all those who wander are lost.",
+    "source": "J.R.R. Tolkien",
+    "date": "2024-12-05",
+    "tags": ["journey", "exploration"]
+  }
+]
