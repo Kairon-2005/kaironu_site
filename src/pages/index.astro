@@ -5,10 +5,480 @@ import '../styles/global.css';
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Home</title>
   </head>
-  <body class="bg-black text-white min-h-screen">
-    <h1 class="text-4xl font-bold p-8">Home</h1>
+  <body class="bg-black text-white overflow-hidden">
+    <!-- Star particle canvas -->
+    <canvas id="stars" class="fixed inset-0 z-0 pointer-events-none"></canvas>
+
+    <!-- Portal container -->
+    <div id="portal" class="fixed inset-0 z-10">
+      <!-- Layer 1: Welcome -->
+      <div class="layer active" data-layer="1">
+        <div class="layer-content">
+          <div class="layer-bg bg-gradient-to-b from-gray-950 via-black to-gray-950"></div>
+          <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">Welcome</h1>
+            <p class="text-gray-400 text-lg md:text-xl max-w-md mb-12">Press Enter to begin your journey</p>
+            <div class="gate-hint text-gray-600 text-sm animate-pulse">Layer 1 of 4</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Layer 2: Writings Gate -->
+      <div class="layer" data-layer="2" data-route="/writings">
+        <div class="layer-content">
+          <div class="layer-bg bg-gradient-to-br from-indigo-950/50 via-black to-purple-950/30"></div>
+          <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
+            <div class="gate-icon text-6xl mb-6 opacity-60">&#9998;</div>
+            <h2 class="text-4xl md:text-6xl font-bold mb-4">Writings</h2>
+            <p class="text-gray-400 text-lg max-w-md mb-8">Long-form thoughts and essays</p>
+            <a href="/writings" class="gate-button group relative px-8 py-4 border border-gray-700 rounded-lg hover:border-gray-500 hover:bg-white/5 transition-all duration-300">
+              <span class="text-lg">Enter</span>
+              <span class="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/10 to-transparent"></span>
+            </a>
+            <div class="gate-hint text-gray-600 text-sm mt-8">Layer 2 of 4</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Layer 3: Fragments Gate -->
+      <div class="layer" data-layer="3" data-route="/fragments">
+        <div class="layer-content">
+          <div class="layer-bg bg-gradient-to-bl from-emerald-950/40 via-black to-teal-950/30"></div>
+          <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
+            <div class="gate-icon text-6xl mb-6 opacity-60">&#10022;</div>
+            <h2 class="text-4xl md:text-6xl font-bold mb-4">Fragments</h2>
+            <p class="text-gray-400 text-lg max-w-md mb-8">Scattered thoughts and quotes</p>
+            <a href="/fragments" class="gate-button group relative px-8 py-4 border border-gray-700 rounded-lg hover:border-gray-500 hover:bg-white/5 transition-all duration-300">
+              <span class="text-lg">Enter</span>
+              <span class="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/10 to-transparent"></span>
+            </a>
+            <div class="gate-hint text-gray-600 text-sm mt-8">Layer 3 of 4</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Layer 4: Message Gate -->
+      <div class="layer" data-layer="4" data-route="/message">
+        <div class="layer-content">
+          <div class="layer-bg bg-gradient-to-tr from-amber-950/40 via-black to-orange-950/30"></div>
+          <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
+            <div class="gate-icon text-6xl mb-6 opacity-60">&#9993;</div>
+            <h2 class="text-4xl md:text-6xl font-bold mb-4">Message</h2>
+            <p class="text-gray-400 text-lg max-w-md mb-8">Get in touch</p>
+            <a href="/message" class="gate-button group relative px-8 py-4 border border-gray-700 rounded-lg hover:border-gray-500 hover:bg-white/5 transition-all duration-300">
+              <span class="text-lg">Enter</span>
+              <span class="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/10 to-transparent"></span>
+            </a>
+            <div class="gate-hint text-gray-600 text-sm mt-8">Layer 4 of 4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation hints -->
+    <div id="nav-hint" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 text-center">
+      <div class="desktop-hint hidden md:block text-gray-500 text-sm">
+        <span class="key-hint">Enter</span> next · <span class="key-hint">Shift+Enter</span> back
+      </div>
+      <div class="mobile-hint md:hidden text-gray-500 text-sm">
+        Tap to continue
+      </div>
+    </div>
+
+    <style>
+      /* Layer base styles */
+      .layer {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.1s ease;
+      }
+
+      .layer.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .layer-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        will-change: transform, filter;
+      }
+
+      .layer-bg {
+        position: absolute;
+        inset: 0;
+      }
+
+      .layer-inner {
+        position: relative;
+        z-index: 1;
+        will-change: transform;
+      }
+
+      /* Idle floating animation */
+      .layer.active .layer-inner {
+        animation: idle-float 6s ease-in-out infinite;
+      }
+
+      .layer.transitioning .layer-inner {
+        animation: none;
+      }
+
+      @keyframes idle-float {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-8px) scale(1.002); }
+      }
+
+      /* Key hint styling */
+      .key-hint {
+        display: inline-block;
+        padding: 2px 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 12px;
+      }
+
+      /* Gate button pulse */
+      .gate-button {
+        animation: gate-pulse 3s ease-in-out infinite;
+      }
+
+      @keyframes gate-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.1); }
+        50% { box-shadow: 0 0 20px 2px rgba(255,255,255,0.05); }
+      }
+
+      /* Transition states applied via JS */
+      .layer-content.travel-out {
+        animation: travel-out 800ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+
+      .layer-content.travel-in {
+        animation: travel-in 800ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+
+      .layer-content.travel-back-out {
+        animation: travel-back-out 800ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+
+      .layer-content.travel-back-in {
+        animation: travel-back-in 800ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+
+      /* Forward travel: zoom in, blur out, fade */
+      @keyframes travel-out {
+        0% {
+          transform: scale(1) translateZ(0);
+          filter: blur(0) contrast(1) brightness(1);
+          opacity: 1;
+        }
+        40% {
+          transform: scale(1.5) translateZ(100px);
+          filter: blur(4px) contrast(1.2) brightness(1.3);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(3) translateZ(300px);
+          filter: blur(12px) contrast(1.5) brightness(2);
+          opacity: 0;
+        }
+      }
+
+      /* Forward travel in: start far, zoom to normal */
+      @keyframes travel-in {
+        0% {
+          transform: scale(0.3) translateZ(-300px);
+          filter: blur(12px) contrast(0.8) brightness(0.5);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(0.8) translateZ(-50px);
+          filter: blur(2px) contrast(0.95) brightness(0.9);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(1) translateZ(0);
+          filter: blur(0) contrast(1) brightness(1);
+          opacity: 1;
+        }
+      }
+
+      /* Backward travel: zoom out, going back */
+      @keyframes travel-back-out {
+        0% {
+          transform: scale(1) translateZ(0);
+          filter: blur(0) contrast(1) brightness(1);
+          opacity: 1;
+        }
+        40% {
+          transform: scale(0.7) translateZ(-100px);
+          filter: blur(4px) contrast(0.9) brightness(0.8);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(0.3) translateZ(-300px);
+          filter: blur(12px) contrast(0.7) brightness(0.5);
+          opacity: 0;
+        }
+      }
+
+      /* Backward travel in: start zoomed, come back */
+      @keyframes travel-back-in {
+        0% {
+          transform: scale(3) translateZ(300px);
+          filter: blur(12px) contrast(1.5) brightness(2);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.2) translateZ(50px);
+          filter: blur(2px) contrast(1.1) brightness(1.1);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(1) translateZ(0);
+          filter: blur(0) contrast(1) brightness(1);
+          opacity: 1;
+        }
+      }
+
+      /* Hide hint during transitions */
+      body.transitioning #nav-hint {
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      body:not(.transitioning) #nav-hint {
+        opacity: 1;
+        transition: opacity 0.3s 0.5s;
+      }
+    </style>
+
+    <script>
+      // Portal state
+      let currentLayer = 1;
+      let isTransitioning = false;
+      const totalLayers = 4;
+      const transitionDuration = 800;
+
+      // Star particle system
+      const canvas = document.getElementById('stars');
+      const ctx = canvas.getContext('2d');
+      let stars = [];
+      let starSpeed = 0.5;
+      let targetSpeed = 0.5;
+      const baseSpeed = 0.5;
+      const maxSpeed = 15;
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      function createStars(count = 200) {
+        stars = [];
+        for (let i = 0; i < count; i++) {
+          stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            z: Math.random() * 1000,
+            size: Math.random() * 1.5 + 0.5,
+            brightness: Math.random() * 0.5 + 0.5
+          });
+        }
+      }
+
+      function drawStars() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        stars.forEach(star => {
+          // Move star toward viewer
+          star.z -= starSpeed * 10;
+
+          // Reset star if it passes the viewer
+          if (star.z <= 0) {
+            star.z = 1000;
+            star.x = Math.random() * canvas.width;
+            star.y = Math.random() * canvas.height;
+          }
+
+          // Project 3D to 2D
+          const scale = 1000 / star.z;
+          const x = (star.x - centerX) * scale + centerX;
+          const y = (star.y - centerY) * scale + centerY;
+          const size = star.size * scale * (starSpeed > 2 ? 1 + (starSpeed - 2) * 0.3 : 1);
+
+          // Draw star with streak when moving fast
+          if (starSpeed > 2) {
+            const streakLength = Math.min(starSpeed * 3, 40);
+            const prevZ = star.z + starSpeed * 10;
+            const prevScale = 1000 / prevZ;
+            const prevX = (star.x - centerX) * prevScale + centerX;
+            const prevY = (star.y - centerY) * prevScale + centerY;
+
+            const gradient = ctx.createLinearGradient(prevX, prevY, x, y);
+            gradient.addColorStop(0, `rgba(255, 255, 255, 0)`);
+            gradient.addColorStop(1, `rgba(255, 255, 255, ${star.brightness * 0.8})`);
+
+            ctx.beginPath();
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = size * 0.8;
+            ctx.moveTo(prevX, prevY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+          }
+
+          // Draw star point
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Smoothly interpolate star speed
+        starSpeed += (targetSpeed - starSpeed) * 0.08;
+      }
+
+      function animateStars() {
+        drawStars();
+        requestAnimationFrame(animateStars);
+      }
+
+      // Initialize stars
+      resizeCanvas();
+      createStars();
+      animateStars();
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        createStars();
+      });
+
+      // Layer transition
+      function transitionToLayer(targetLayer, direction = 'forward') {
+        if (isTransitioning || targetLayer < 1 || targetLayer > totalLayers || targetLayer === currentLayer) {
+          return;
+        }
+
+        isTransitioning = true;
+        document.body.classList.add('transitioning');
+
+        const currentEl = document.querySelector(`.layer[data-layer="${currentLayer}"]`);
+        const targetEl = document.querySelector(`.layer[data-layer="${targetLayer}"]`);
+        const currentContent = currentEl.querySelector('.layer-content');
+        const targetContent = targetEl.querySelector('.layer-content');
+
+        // Accelerate stars
+        targetSpeed = maxSpeed;
+
+        // Apply transition classes
+        if (direction === 'forward') {
+          currentContent.classList.add('travel-out');
+          currentEl.classList.add('transitioning');
+        } else {
+          currentContent.classList.add('travel-back-out');
+          currentEl.classList.add('transitioning');
+        }
+
+        // Midpoint: switch layers
+        setTimeout(() => {
+          currentEl.classList.remove('active');
+          currentContent.classList.remove('travel-out', 'travel-back-out');
+
+          targetEl.classList.add('active');
+          targetEl.classList.add('transitioning');
+
+          if (direction === 'forward') {
+            targetContent.classList.add('travel-in');
+          } else {
+            targetContent.classList.add('travel-back-in');
+          }
+
+          currentLayer = targetLayer;
+        }, transitionDuration / 2);
+
+        // End transition
+        setTimeout(() => {
+          targetContent.classList.remove('travel-in', 'travel-back-in');
+          currentEl.classList.remove('transitioning');
+          targetEl.classList.remove('transitioning');
+
+          // Decelerate stars
+          targetSpeed = baseSpeed;
+
+          isTransitioning = false;
+          document.body.classList.remove('transitioning');
+        }, transitionDuration);
+      }
+
+      // Keyboard navigation
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (e.shiftKey) {
+            // Go back
+            transitionToLayer(currentLayer - 1, 'backward');
+          } else {
+            // Go forward
+            transitionToLayer(currentLayer + 1, 'forward');
+          }
+        }
+      });
+
+      // Touch/click navigation for mobile
+      let touchStartY = 0;
+      document.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      document.addEventListener('touchend', (e) => {
+        // Ignore if tapping a link
+        if (e.target.closest('a')) return;
+
+        const touchEndY = e.changedTouches[0].clientY;
+        const diff = touchStartY - touchEndY;
+
+        if (Math.abs(diff) < 50) {
+          // Simple tap - go forward
+          transitionToLayer(currentLayer + 1, 'forward');
+        } else if (diff > 50) {
+          // Swipe up - go forward
+          transitionToLayer(currentLayer + 1, 'forward');
+        } else if (diff < -50) {
+          // Swipe down - go back
+          transitionToLayer(currentLayer - 1, 'backward');
+        }
+      }, { passive: true });
+
+      // Gate button click transition
+      document.querySelectorAll('.gate-button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const href = btn.getAttribute('href');
+
+          // Quick transition effect before navigation
+          targetSpeed = maxSpeed;
+          document.body.classList.add('transitioning');
+
+          const layer = btn.closest('.layer');
+          const content = layer.querySelector('.layer-content');
+          content.classList.add('travel-out');
+
+          setTimeout(() => {
+            window.location.href = href;
+          }, 400);
+        });
+      });
+    </script>
   </body>
 </html>
