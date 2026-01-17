@@ -14,8 +14,11 @@ function constantTimeCompare(a, b) {
 const POST = async ({ request }) => {
   try {
     const auth = request.headers.get("Authorization");
-    const ADMIN_USER = process.env.ADMIN_USER || "admin";
-    const ADMIN_PASS = process.env.ADMIN_PASS || "admin";
+    const ADMIN_USER = process.env.ADMIN_USER;
+    const ADMIN_PASS = process.env.ADMIN_PASS;
+    if (!ADMIN_USER || !ADMIN_PASS) {
+      throw new Error("Missing ADMIN_USER / ADMIN_PASS env vars");
+    }
     if (!auth) {
       return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
         status: 401,
