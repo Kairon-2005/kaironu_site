@@ -2,7 +2,7 @@
 import '../../styles/global.css';
 import { getCollection, render } from 'astro:content';
 import { countWords } from '../../utils/wordCount';
-
+export const prerender = true;
 export async function getStaticPaths() {
   const writings = await getCollection('writings');
   return writings.map((writing) => ({
