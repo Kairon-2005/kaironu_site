@@ -1,0 +1,119 @@
+---
+import '../../../styles/global.css';
+
+export async function getStaticPaths() {
+  return [];
+}
+
+const { id } = Astro.params;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>View Reply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-black text-white min-h-screen">
+    <div class="container mx-auto px-8 py-16 max-w-2xl">
+      <!-- Header -->
+      <div class="mb-12">
+        <a href="/" class="inline-block mb-8 text-[#F5F2EA] hover:text-white transition-colors duration-300 text-lg">
+          ← Home
+        </a>
+        <h1 class="text-4xl font-light text-[#F5F2EA] font-serif italic mb-4">View Reply</h1>
+      </div>
+
+      <!-- Key input form -->
+      <div id="keyForm" class="space-y-8">
+        <div class="space-y-3">
+          <label for="replyKey" class="block text-[#F5F2EA] text-sm">Reply Key</label>
+          <input type="text" id="replyKey" name="replyKey" required
+                 class="w-full bg-transparent border border-[#F5F2EA] rounded px-4 py-3 text-[#F5F2EA] placeholder-gray-500 focus:outline-none focus:border-white transition-colors duration-300 font-mono"
+                 placeholder="Enter your reply key">
+        </div>
+
+        <button type="submit" id="submitBtn"
+                class="w-full bg-transparent border border-[#F5F2EA] text-[#F5F2EA] px-6 py-4 rounded hover:bg-[#F5F2EA] hover:text-black transition-all duration-300 font-serif italic text-lg">
+          View Reply
+        </button>
+
+        <div id="error" class="hidden text-red-400 text-sm"></div>
+      </div>
+
+      <!-- Reply content -->
+      <div id="replyContent" class="hidden space-y-8">
+        <div class="bg-black border border-[#F5F2EA] rounded-lg p-6">
+          <div id="replyText" class="text-[#F5F2EA] leading-relaxed whitespace-pre-wrap"></div>
+        </div>
+
+        <a href="/" class="inline-block bg-transparent border border-[#F5F2EA] text-[#F5F2EA] px-8 py-3 rounded hover:bg-[#F5F2EA] hover:text-black transition-all duration-300 font-serif italic">
+          ← Home
+        </a>
+      </div>
+    </div>
+
+    <script define:vars={{ messageId: id }}>
+      const keyForm = document.getElementById('keyForm');
+      const keyInput = document.getElementById('replyKey');
+      const submitBtn = document.getElementById('submitBtn');
+      const error = document.getElementById('error');
+      const replyContent = document.getElementById('replyContent');
+      const replyText = document.getElementById('replyText');
+
+      submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        const key = keyInput.value.trim();
+        if (!key) {
+          error.textContent = 'Please enter a reply key';
+          error.classList.remove('hidden');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Checking...';
+        error.classList.add('hidden');
+
+        try {
+          const response = await fetch('/api/message/reply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: messageId, key })
+          });
+
+          const result = await response.json();
+
+          if (result.ok) {
+            if (result.reply) {
+              replyText.textContent = result.reply;
+              keyForm.classList.add('hidden');
+              replyContent.classList.remove('hidden');
+            } else {
+              replyText.textContent = 'No reply yet.';
+              keyForm.classList.add('hidden');
+              replyContent.classList.remove('hidden');
+            }
+          } else {
+            throw new Error(result.error || 'Invalid key');
+          }
+        } catch (err) {
+          error.textContent = err.message;
+          error.classList.remove('hidden');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'View Reply';
+        }
+      });
+
+      // Allow Enter key submission
+      keyInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          submitBtn.click();
+        }
+      });
+    </script>
+  </body>
+</html>

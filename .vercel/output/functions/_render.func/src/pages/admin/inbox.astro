@@ -1,0 +1,344 @@
+---
+import '../../styles/global.css';
+import { sql } from '@vercel/postgres';
+
+// Basic Auth check
+const auth = Astro.request.headers.get('Authorization');
+const ADMIN_USER = import.meta.env.ADMIN_USER || 'admin';
+const ADMIN_PASS = import.meta.env.ADMIN_PASS || 'admin';
+
+if (!auth) {
+  return new Response('Unauthorized', {
+    status: 401,
+    headers: { 'WWW-Authenticate': 'Basic realm="Admin Area"' }
+  });
+}
+
+const [scheme, encoded] = auth.split(' ');
+if (scheme !== 'Basic') {
+  return new Response('Unauthorized', { status: 401 });
+}
+
+const [user, pass] = atob(encoded).split(':');
+if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
+  return new Response('Unauthorized', { status: 401 });
+}
+
+// Get query parameters for filtering
+const url = new URL(Astro.request.url);
+const mode = url.searchParams.get('mode') || 'all';
+const status = url.searchParams.get('status') || 'all';
+const replyPref = url.searchParams.get('reply_preference') || 'all';
+const replied = url.searchParams.get('replied') || 'all';
+const messageId = url.searchParams.get('id');
+
+let messages = [];
+let selectedMessage = null;
+let error = null;
+
+try {
+  // Build WHERE clause
+  const conditions = [];
+  const params = [];
+  let paramIndex = 1;
+
+  if (mode !== 'all') {
+    conditions.push(`mode = $${paramIndex}`);
+    params.push(mode);
+    paramIndex++;
+  }
+  if (status !== 'all') {
+    conditions.push(`status = $${paramIndex}`);
+    params.push(status);
+    paramIndex++;
+  }
+  if (replyPref !== 'all') {
+    conditions.push(`reply_preference = $${paramIndex}`);
+    params.push(replyPref);
+    paramIndex++;
+  }
+  if (replied === 'yes') {
+    conditions.push('reply_text IS NOT NULL');
+  } else if (replied === 'no') {
+    conditions.push('reply_text IS NULL');
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+  
+  const query = `
+    SELECT id, created_at, mode, reply_preference, display_name, is_anonymous, 
+           body, status, admin_tags, reply_text, replied_at, ip_hash, user_agent
+    FROM messages 
+    ${whereClause}
+    ORDER BY created_at DESC
+  `;
+
+  const result = await sql.query(query, params);
+  messages = result.rows;
+
+  // Get specific message if ID provided
+  if (messageId) {
+    selectedMessage = messages.find(m => m.id === messageId);
+  }
+} catch (err) {
+  error = err.message;
+}
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Admin Inbox</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-black text-white min-h-screen">
+    <div class="container mx-auto px-8 py-16 max-w-7xl">
+      <!-- Header -->
+      <div class="mb-12">
+        <a href="/" class="inline-block mb-8 text-[#F5F2EA] hover:text-white transition-colors duration-300 text-lg">
+          ← Home
+        </a>
+        <h1 class="text-4xl font-light text-[#F5F2EA] font-serif italic mb-4">Admin Inbox</h1>
+      </div>
+
+      {selectedMessage ? (
+        <!-- Message detail view -->
+        <div class="space-y-8">
+          <div class="flex items-center space-x-4">
+            <a href="/admin/inbox" class="text-[#F5F2EA] hover:text-white transition-colors duration-300">
+              ← Back to inbox
+            </a>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Message content -->
+            <div class="space-y-6">
+              <div class="bg-black border border-[#F5F2EA]/30 rounded-lg p-6">
+                <div class="space-y-4">
+                  <div class="flex justify-between items-start">
+                    <h2 class="text-[#F5F2EA] text-xl font-serif">{selectedMessage.display_name}</h2>
+                    <time class="text-[#F5F2EA]/50 text-sm">
+                      {new Date(selectedMessage.created_at).toLocaleString()}
+                    </time>
+                  </div>
+                  
+                  <div class="flex flex-wrap gap-2 text-xs">
+                    <span class="px-2 py-1 bg-[#F5F2EA]/10 text-[#F5F2EA] rounded">
+                      {selectedMessage.mode}
+                    </span>
+                    <span class="px-2 py-1 bg-[#F5F2EA]/10 text-[#F5F2EA] rounded">
+                      {selectedMessage.reply_preference}
+                    </span>
+                    <span class={`px-2 py-1 rounded ${
+                      selectedMessage.status === 'approved' ? 'bg-green-900/30 text-green-300' :
+                      selectedMessage.status === 'rejected' ? 'bg-red-900/30 text-red-300' :
+                      'bg-yellow-900/30 text-yellow-300'
+                    }`}>
+                      {selectedMessage.status}
+                    </span>
+                  </div>
+                  
+                  <div class="text-[#F5F2EA] leading-relaxed whitespace-pre-wrap">
+                    {selectedMessage.body}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Admin controls -->
+            <div class="space-y-6">
+              <form id="updateForm" class="bg-black border border-[#F5F2EA]/30 rounded-lg p-6 space-y-4">
+                <h3 class="text-[#F5F2EA] text-lg font-serif mb-4">Update Message</h3>
+                
+                <div>
+                  <label class="block text-[#F5F2EA] text-sm mb-2">Status</label>
+                  <select name="status" class="w-full bg-black border border-[#F5F2EA] rounded px-3 py-2 text-[#F5F2EA]">
+                    <option value="pending" {selectedMessage.status === 'pending' ? 'selected' : ''}>Pending</option>
+                    <option value="approved" {selectedMessage.status === 'approved' ? 'selected' : ''}>Approved</option>
+                    <option value="rejected" {selectedMessage.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[#F5F2EA] text-sm mb-2">Reply</label>
+                  <textarea name="replyText" rows="6" 
+                            class="w-full bg-black border border-[#F5F2EA] rounded px-3 py-2 text-[#F5F2EA] resize-vertical"
+                            placeholder="Write a reply...">{selectedMessage.reply_text || ''}</textarea>
+                </div>
+
+                <button type="submit" 
+                        class="w-full bg-transparent border border-[#F5F2EA] text-[#F5F2EA] px-4 py-3 rounded hover:bg-[#F5F2EA] hover:text-black transition-all duration-300">
+                  Save Changes
+                </button>
+
+                <div id="saveStatus" class="hidden text-sm"></div>
+              </form>
+
+              <!-- Metadata -->
+              <div class="bg-black border border-[#F5F2EA]/20 rounded-lg p-4 text-xs">
+                <h4 class="text-[#F5F2EA] mb-2">Metadata</h4>
+                <div class="space-y-1 text-[#F5F2EA]/60">
+                  <div>ID: {selectedMessage.id}</div>
+                  <div>IP Hash: {selectedMessage.ip_hash || 'None'}</div>
+                  <div>User Agent: {selectedMessage.user_agent || 'None'}</div>
+                  {selectedMessage.replied_at && (
+                    <div>Replied: {new Date(selectedMessage.replied_at).toLocaleString()}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <!-- Message list view -->
+        <div class="space-y-8">
+          <!-- Filters -->
+          <form method="get" class="bg-black border border-[#F5F2EA]/30 rounded-lg p-6">
+            <h2 class="text-[#F5F2EA] text-lg font-serif mb-4">Filters</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-[#F5F2EA] text-sm mb-2">Mode</label>
+                <select name="mode" class="w-full bg-black border border-[#F5F2EA] rounded px-3 py-2 text-[#F5F2EA] text-sm">
+                  <option value="all" {mode === 'all' ? 'selected' : ''}>All</option>
+                  <option value="public" {mode === 'public' ? 'selected' : ''}>Public</option>
+                  <option value="private" {mode === 'private' ? 'selected' : ''}>Private</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="block text-[#F5F2EA] text-sm mb-2">Status</label>
+                <select name="status" class="w-full bg-black border border-[#F5F2EA] rounded px-3 py-2 text-[#F5F2EA] text-sm">
+                  <option value="all" {status === 'all' ? 'selected' : ''}>All</option>
+                  <option value="pending" {status === 'pending' ? 'selected' : ''}>Pending</option>
+                  <option value="approved" {status === 'approved' ? 'selected' : ''}>Approved</option>
+                  <option value="rejected" {status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="block text-[#F5F2EA] text-sm mb-2">Reply Pref</label>
+                <select name="reply_preference" class="w-full bg-black border border-[#F5F2EA] rounded px-3 py-2 text-[#F5F2EA] text-sm">
+                  <option value="all" {replyPref === 'all' ? 'selected' : ''}>All</option>
+                  <option value="none" {replyPref === 'none' ? 'selected' : ''}>None</option>
+                  <option value="key" {replyPref === 'key' ? 'selected' : ''}>Key</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="block text-[#F5F2EA] text-sm mb-2">Replied</label>
+                <select name="replied" class="w-full bg-black border border-[#F5F2EA] rounded px-3 py-2 text-[#F5F2EA] text-sm">
+                  <option value="all" {replied === 'all' ? 'selected' : ''}>All</option>
+                  <option value="yes" {replied === 'yes' ? 'selected' : ''}>Yes</option>
+                  <option value="no" {replied === 'no' ? 'selected' : ''}>No</option>
+                </select>
+              </div>
+            </div>
+            
+            <button type="submit" class="mt-4 bg-transparent border border-[#F5F2EA] text-[#F5F2EA] px-4 py-2 rounded hover:bg-[#F5F2EA] hover:text-black transition-all duration-300 text-sm">
+              Apply Filters
+            </button>
+          </form>
+
+          <!-- Messages table -->
+          {error ? (
+            <div class="text-red-400 text-sm">Error: {error}</div>
+          ) : messages.length === 0 ? (
+            <div class="text-[#F5F2EA]/70 text-center py-8">No messages found.</div>
+          ) : (
+            <div class="bg-black border border-[#F5F2EA]/30 rounded-lg overflow-hidden">
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-[#F5F2EA]/20">
+                    <th class="px-6 py-4 text-left text-[#F5F2EA] text-sm font-serif">Name</th>
+                    <th class="px-6 py-4 text-left text-[#F5F2EA] text-sm font-serif">Mode</th>
+                    <th class="px-6 py-4 text-left text-[#F5F2EA] text-sm font-serif">Status</th>
+                    <th class="px-6 py-4 text-left text-[#F5F2EA] text-sm font-serif">Reply</th>
+                    <th class="px-6 py-4 text-left text-[#F5F2EA] text-sm font-serif">Date</th>
+                    <th class="px-6 py-4 text-left text-[#F5F2EA] text-sm font-serif">Preview</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {messages.map((message) => (
+                    <tr class="border-b border-[#F5F2EA]/10 hover:bg-[#F5F2EA]/5 transition-colors duration-300">
+                      <td class="px-6 py-4">
+                        <a href={`/admin/inbox?id=${message.id}`} class="text-[#F5F2EA] hover:text-white transition-colors duration-300">
+                          {message.display_name}
+                        </a>
+                      </td>
+                      <td class="px-6 py-4 text-[#F5F2EA]/80 text-sm">{message.mode}</td>
+                      <td class="px-6 py-4">
+                        <span class={`px-2 py-1 rounded text-xs ${
+                          message.status === 'approved' ? 'bg-green-900/30 text-green-300' :
+                          message.status === 'rejected' ? 'bg-red-900/30 text-red-300' :
+                          'bg-yellow-900/30 text-yellow-300'
+                        }`}>
+                          {message.status}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 text-[#F5F2EA]/80 text-sm">
+                        {message.reply_text ? '✓' : message.reply_preference}
+                      </td>
+                      <td class="px-6 py-4 text-[#F5F2EA]/60 text-sm">
+                        {new Date(message.created_at).toLocaleDateString()}
+                      </td>
+                      <td class="px-6 py-4 text-[#F5F2EA]/70 text-sm max-w-xs">
+                        <div class="truncate">{message.body}</div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+
+    {selectedMessage && (
+      <script define:vars={{ messageId: selectedMessage.id }}>
+        const form = document.getElementById('updateForm');
+        const saveStatus = document.getElementById('saveStatus');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const formData = new FormData(form);
+          const data = {
+            id: messageId,
+            status: formData.get('status'),
+            replyText: formData.get('replyText')
+          };
+
+          try {
+            const response = await fetch('/api/admin/message/update', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.ok) {
+              saveStatus.textContent = 'Changes saved successfully';
+              saveStatus.className = 'text-green-400 text-sm';
+              saveStatus.classList.remove('hidden');
+              
+              setTimeout(() => {
+                saveStatus.classList.add('hidden');
+              }, 3000);
+            } else {
+              throw new Error(result.error || 'Failed to save changes');
+            }
+          } catch (err) {
+            saveStatus.textContent = `Error: ${err.message}`;
+            saveStatus.className = 'text-red-400 text-sm';
+            saveStatus.classList.remove('hidden');
+          }
+        });
+      </script>
+    )}
+  </body>
+</html>
