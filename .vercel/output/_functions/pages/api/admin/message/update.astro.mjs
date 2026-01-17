@@ -46,32 +46,39 @@ const POST = async ({ request }) => {
         headers: { "Content-Type": "application/json" }
       });
     }
-    const updates = [];
-    const params = [];
-    let paramIndex = 1;
-    if (data.status && ["pending", "approved", "rejected"].includes(data.status)) {
-      updates.push(`status = $${paramIndex}`);
-      params.push(data.status);
-      paramIndex++;
-    }
-    if (data.replyText !== void 0) {
-      updates.push(`reply_text = $${paramIndex}`);
-      params.push(data.replyText || null);
-      paramIndex++;
-      if (data.replyText && data.replyText.trim()) {
-        updates.push(`replied_at = now()`);
-      }
-    }
-    if (updates.length === 0) {
+    const hasValidStatus = data.status && ["pending", "approved", "rejected"].includes(data.status);
+    const hasReplyText = data.replyText !== void 0;
+    if (!hasValidStatus && !hasReplyText) {
       return new Response(JSON.stringify({ ok: false, error: "No valid updates provided" }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
     }
-    params.push(data.id);
-    const whereClause = `WHERE id = $${paramIndex}`;
-    const query = `UPDATE messages SET ${updates.join(", ")} ${whereClause}`;
-    await sql.query(query, params);
+    if (data.status && data.replyText !== void 0) {
+      if (data.replyText && data.replyText.trim()) {
+        await sql`UPDATE messages SET 
+          status = ${data.status}, 
+          reply_text = ${data.replyText},
+          replied_at = now()
+          WHERE id = ${data.id}`;
+      } else {
+        await sql`UPDATE messages SET 
+          status = ${data.status}, 
+          reply_text = ${data.replyText}
+          WHERE id = ${data.id}`;
+      }
+    } else if (data.status) {
+      await sql`UPDATE messages SET status = ${data.status} WHERE id = ${data.id}`;
+    } else if (data.replyText !== void 0) {
+      if (data.replyText && data.replyText.trim()) {
+        await sql`UPDATE messages SET 
+          reply_text = ${data.replyText},
+          replied_at = now()
+          WHERE id = ${data.id}`;
+      } else {
+        await sql`UPDATE messages SET reply_text = ${data.replyText} WHERE id = ${data.id}`;
+      }
+    }
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { "Content-Type": "application/json" }

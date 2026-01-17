@@ -56,42 +56,46 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Build update query
-    const updates = [];
-    const params = [];
-    let paramIndex = 1;
-
-    if (data.status && ['pending', 'approved', 'rejected'].includes(data.status)) {
-      updates.push(`status = $${paramIndex}`);
-      params.push(data.status);
-      paramIndex++;
-    }
-
-    if (data.replyText !== undefined) {
-      updates.push(`reply_text = $${paramIndex}`);
-      params.push(data.replyText || null);
-      paramIndex++;
-      
-      // If setting reply text, also update replied_at
-      if (data.replyText && data.replyText.trim()) {
-        updates.push(`replied_at = now()`);
-      }
-    }
-
-    if (updates.length === 0) {
+    // Validate the update data
+    const hasValidStatus = data.status && ['pending', 'approved', 'rejected'].includes(data.status);
+    const hasReplyText = data.replyText !== undefined;
+    
+    if (!hasValidStatus && !hasReplyText) {
       return new Response(JSON.stringify({ ok: false, error: 'No valid updates provided' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Add message ID as the last parameter
-    params.push(data.id);
-    const whereClause = `WHERE id = $${paramIndex}`;
-
-    const query = `UPDATE messages SET ${updates.join(', ')} ${whereClause}`;
-    
-    await sql.query(query, params);
+    // Use template literal approach - more secure and readable
+    if (data.status && data.replyText !== undefined) {
+      // Both status and reply text updates
+      if (data.replyText && data.replyText.trim()) {
+        await sql`UPDATE messages SET 
+          status = ${data.status}, 
+          reply_text = ${data.replyText},
+          replied_at = now()
+          WHERE id = ${data.id}`;
+      } else {
+        await sql`UPDATE messages SET 
+          status = ${data.status}, 
+          reply_text = ${data.replyText}
+          WHERE id = ${data.id}`;
+      }
+    } else if (data.status) {
+      // Status update only
+      await sql`UPDATE messages SET status = ${data.status} WHERE id = ${data.id}`;
+    } else if (data.replyText !== undefined) {
+      // Reply text update only
+      if (data.replyText && data.replyText.trim()) {
+        await sql`UPDATE messages SET 
+          reply_text = ${data.replyText},
+          replied_at = now()
+          WHERE id = ${data.id}`;
+      } else {
+        await sql`UPDATE messages SET reply_text = ${data.replyText} WHERE id = ${data.id}`;
+      }
+    }
 
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
