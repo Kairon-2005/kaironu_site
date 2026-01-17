@@ -61,10 +61,16 @@ import '../styles/global.css';
         <div class="layer" data-layer="2" data-route="/writings">
           <div class="layer-content">
             <div class="layer-bg layer-bg-monolith"></div>
-            <div class="monolith-shapes"></div>
+            <!-- Layer 2 Three.js Canvas Container -->
+            <div id="l2-canvas-container"></div>
+            <!-- Layer 2 Overlays -->
+            <div class="l2-scanlines"></div>
+            <div class="l2-glitch-noise"></div>
+            <div class="l2-vignette"></div>
+            <!-- Gate Link -->
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
               <a href="/writings" class="gate-link" data-gate>
-                <span class="gate-text text-6xl md:text-8xl">Writings</span>
+                <span class="layer2-title cinzel">Writings</span>
               </a>
             </div>
           </div>
@@ -95,10 +101,17 @@ import '../styles/global.css';
         <div class="layer" data-layer="4" data-route="/message">
           <div class="layer-content">
             <div class="layer-bg layer-bg-beacon"></div>
-            <div class="beacon-rays"></div>
+            <!-- Layer 4 Canvas Container -->
+            <div id="l4-canvas-container">
+              <canvas id="l4-pond-canvas"></canvas>
+            </div>
+            <!-- Layer 4 Overlays -->
+            <div class="l4-vignette"></div>
+            <div class="l4-grain"></div>
+            <!-- Gate Link -->
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
               <a href="/message" class="gate-link" data-gate>
-                <span class="gate-text text-6xl md:text-8xl">Message</span>
+                <span class="layer4-title cinzel">Message</span>
               </a>
             </div>
           </div>
@@ -262,6 +275,74 @@ import '../styles/global.css';
       }
       .gate-link:hover .layer3-title {
         text-shadow: 0 0 30px rgba(165, 243, 252, 0.6), 0 0 60px rgba(165, 243, 252, 0.3);
+      }
+
+      /* Layer 2 title - matches Layer 1 AION exactly */
+      .layer2-title {
+        font-size: clamp(3rem, 10vw, 7rem);
+        font-weight: 700;
+        color: #fff;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.3);
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        transition: all 0.6s ease;
+      }
+      .gate-link:hover .layer2-title {
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(255, 255, 255, 0.4);
+      }
+
+      /* Layer 2 Canvas Container */
+      #l2-canvas-container {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        filter: contrast(1.2) brightness(1.1);
+      }
+
+      /* Layer 2 Scanlines */
+      .l2-scanlines {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(255,255,255,0),
+          rgba(255,255,255,0) 50%,
+          rgba(0,0,0,0.2) 50%,
+          rgba(0,0,0,0.2)
+        );
+        background-size: 100% 4px;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      /* Layer 2 Glitch Noise */
+      .l2-glitch-noise {
+        position: absolute;
+        inset: 0;
+        opacity: 0.05;
+        pointer-events: none;
+        z-index: 11;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        animation: l2-noise-anim 0.5s steps(5) infinite;
+      }
+
+      @keyframes l2-noise-anim {
+        0% { transform: translate(0,0); }
+        20% { transform: translate(-5%,-5%); }
+        40% { transform: translate(-5%,5%); }
+        60% { transform: translate(5%,-5%); }
+        80% { transform: translate(5%,5%); }
+        100% { transform: translate(0,0); }
+      }
+
+      /* Layer 2 Vignette */
+      .l2-vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,1) 100%);
+        z-index: 12;
+        pointer-events: none;
       }
 
       .layer1-divider {
@@ -437,6 +518,54 @@ import '../styles/global.css';
       @keyframes beacon-rotate {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
+      }
+
+      /* Layer 4 title - matches reference exactly */
+      .layer4-title {
+        font-size: clamp(3rem, 10vw, 7rem);
+        font-weight: 700;
+        color: #f8fafc;
+        text-shadow: 0 0 25px rgba(255, 255, 255, 0.3), 0 0 50px rgba(165, 243, 252, 0.1);
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        transition: all 0.6s ease;
+      }
+      .gate-link:hover .layer4-title {
+        text-shadow: 0 0 35px rgba(255, 255, 255, 0.5), 0 0 70px rgba(165, 243, 252, 0.2);
+      }
+
+      /* Layer 4 Canvas Container */
+      #l4-canvas-container {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+      }
+      #l4-pond-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Layer 4 Vignette */
+      .l4-vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at center, rgba(15,23,42,0) 0%, rgba(2,6,23,1) 80%);
+        z-index: 5;
+        pointer-events: none;
+      }
+
+      /* Layer 4 Grain */
+      .l4-grain {
+        position: absolute;
+        inset: 0;
+        opacity: 0.04;
+        pointer-events: none;
+        z-index: 50;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
       }
 
       /* Layer base */
@@ -1219,6 +1348,326 @@ import '../styles/global.css';
       })();
     </script>
 
+    <!-- ============ LAYER 2 TEXT TUNNEL SYSTEM (THREE.JS) ============ -->
+    <script type="module">
+      /**
+       * Layer 2 Visual - Text Tunnel with Three.js
+       * Only runs when Layer 2 is active, pauses otherwise
+       */
+      import('https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.module.js').then((THREE) => {
+        const container = document.getElementById('l2-canvas-container');
+        if (!container) return;
+
+        let scene, camera, renderer;
+        let sprites = [];
+        let particleSystem;
+        let animationId = null;
+        let isActive = false;
+        let time = 0;
+        let mouseX = 0, mouseY = 0;
+
+        // Cap DPR for performance
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+
+        // --- DATA CORPUS ---
+        const nietzscheQuote = [
+          "Dieses Leben", "wie du es jetzt lebst", "und gelebt hast",
+          "wirst du noch einmal", "und noch unzählige Male", "leben müssen",
+          "jeder Schmerz", "jede Lust", "jeder Gedanke", "jeder Seufzer",
+          "Das ewige Sanduhr", "des Daseins"
+        ];
+
+        const ancientWords = [
+          "AION", "CHRONOS", "KAIROS", "LOGOS", "ARCHE", "APEIRON",
+          "MEMENTO MORI", "AMOR FATI", "ETERNALIS", "ABSOLUTUM",
+          "L'Absolu", "Le Néant", "La Durée", "L'Élan Vital",
+          "Das Ding an sich", "Wille zur Macht", "Dasein",
+          "L'Eterno Ritorno", "Il Tempo"
+        ];
+
+        const symbols = [
+          "∑", "∫", "∂", "∇", "∀", "∃", "∞", "∅", "∈", "⊂",
+          "λ", "Ω", "Ψ", "Φ", "∆", "π", "≠", "≈",
+          "0x00", "NULL", "void*", "i++", "&&", "||", "=>",
+          "†", "ERROR", "MEMORY", "TIME STAMP"
+        ];
+
+        function createTextTexture(text, fontStyle) {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          ctx.font = fontStyle;
+          const textWidth = ctx.measureText(text).width;
+          
+          canvas.width = Math.max(textWidth + 20, 100);
+          canvas.height = 60;
+
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.font = fontStyle;
+          ctx.fillStyle = "rgba(255, 255, 255, 1)";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          
+          ctx.shadowColor = "rgba(255, 255, 255, 0.8)";
+          ctx.shadowBlur = 10;
+          
+          ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+          
+          const texture = new THREE.CanvasTexture(canvas);
+          texture.minFilter = THREE.LinearFilter;
+          texture.needsUpdate = true;
+          
+          return { texture, ratio: canvas.width / canvas.height };
+        }
+
+        function init() {
+          // Scene setup
+          scene = new THREE.Scene();
+          scene.background = new THREE.Color(0x000000);
+          scene.fog = new THREE.FogExp2(0x000000, 0.025);
+          
+          camera = new THREE.PerspectiveCamera(
+            70,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+          );
+          camera.position.z = 0;
+
+          renderer = new THREE.WebGLRenderer({
+            antialias: false,
+            alpha: false
+          });
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          renderer.setPixelRatio(dpr);
+          container.appendChild(renderer.domElement);
+
+          // Populate sprites (reduced count for performance on mobile)
+          const isMobile = window.innerWidth < 768;
+          const count = isMobile ? 150 : 300;
+          
+          for (let i = 0; i < count; i++) {
+            let txt, fontSize;
+            const r = Math.random();
+            
+            if (r > 0.92) {
+              txt = nietzscheQuote[Math.floor(Math.random() * nietzscheQuote.length)];
+              fontSize = 'Bold 60px "Cinzel", serif';
+            } else if (r > 0.7) {
+              txt = ancientWords[Math.floor(Math.random() * ancientWords.length)];
+              fontSize = 'Bold 45px "Cormorant Garamond", serif';
+            } else {
+              txt = symbols[Math.floor(Math.random() * symbols.length)];
+              fontSize = '40px "EB Garamond", serif';
+            }
+
+            const { texture, ratio } = createTextTexture(txt, fontSize);
+            
+            const material = new THREE.SpriteMaterial({
+              map: texture,
+              color: 0xffffff,
+              transparent: true,
+              opacity: Math.random() * 0.5 + 0.2,
+              blending: THREE.AdditiveBlending,
+              depthWrite: false
+            });
+
+            const sprite = new THREE.Sprite(material);
+            
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 3 + Math.random() * 15;
+            
+            sprite.position.x = Math.cos(angle) * radius;
+            sprite.position.y = Math.sin(angle) * radius;
+            sprite.position.z = -Math.random() * 100;
+
+            const scale = Math.random() * 2 + 0.5;
+            sprite.scale.set(scale * ratio, scale, 1);
+
+            sprite.userData = {
+              speed: Math.random() * 0.1 + 0.05,
+              wobbleSpeed: Math.random() * 2,
+              wobbleAmp: Math.random() * 0.1,
+              initialX: sprite.position.x,
+              initialY: sprite.position.y
+            };
+
+            scene.add(sprite);
+            sprites.push(sprite);
+          }
+
+          // Particle dust (reduced for mobile)
+          const particlesGeo = new THREE.BufferGeometry();
+          const pCount = isMobile ? 300 : 600;
+          const pPos = new Float32Array(pCount * 3);
+          for (let i = 0; i < pCount * 3; i++) {
+            pPos[i] = (Math.random() - 0.5) * 60;
+          }
+          particlesGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+          const particlesMat = new THREE.PointsMaterial({
+            size: 0.05,
+            color: 0x888888,
+            transparent: true,
+            opacity: 0.4,
+            blending: THREE.AdditiveBlending
+          });
+          particleSystem = new THREE.Points(particlesGeo, particlesMat);
+          scene.add(particleSystem);
+
+          // Mouse tracking
+          document.addEventListener('mousemove', handleMouseMove);
+        }
+
+        function handleMouseMove(e) {
+          mouseX = (e.clientX - window.innerWidth / 2) * 0.0005;
+          mouseY = (e.clientY - window.innerHeight / 2) * 0.0005;
+        }
+
+        function handleResize() {
+          if (!camera || !renderer) return;
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+          if (!isActive) {
+            animationId = null;
+            return;
+          }
+
+          time += 0.01;
+
+          // Move Sprites
+          sprites.forEach(sprite => {
+            sprite.position.z += sprite.userData.speed;
+            
+            sprite.position.x = sprite.userData.initialX +
+              Math.cos(time * sprite.userData.wobbleSpeed) * sprite.userData.wobbleAmp;
+            sprite.position.y = sprite.userData.initialY +
+              Math.sin(time * sprite.userData.wobbleSpeed) * sprite.userData.wobbleAmp;
+
+            const dist = sprite.position.z;
+            if (dist < -50) {
+              sprite.material.opacity = 0;
+            } else if (dist < -10) {
+              sprite.material.opacity = Math.min(1, (dist + 50) / 40) * 0.6;
+            } else if (dist > 2) {
+              sprite.material.opacity -= 0.05;
+            }
+
+            if (sprite.position.z > 5 || sprite.material.opacity <= 0) {
+              if (sprite.position.z > 5) {
+                sprite.position.z = -100 - Math.random() * 20;
+                sprite.material.opacity = 0;
+                
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 3 + Math.random() * 15;
+                sprite.userData.initialX = Math.cos(angle) * radius;
+                sprite.userData.initialY = Math.sin(angle) * radius;
+                sprite.position.x = sprite.userData.initialX;
+                sprite.position.y = sprite.userData.initialY;
+              }
+            }
+          });
+
+          // Move Particles
+          if (particleSystem) {
+            const positions = particleSystem.geometry.attributes.position.array;
+            for (let i = 2; i < positions.length; i += 3) {
+              positions[i] += 0.2;
+              if (positions[i] > 5) positions[i] = -60;
+            }
+            particleSystem.geometry.attributes.position.needsUpdate = true;
+          }
+
+          // Camera parallax
+          camera.rotation.x += (mouseY - camera.rotation.x) * 0.05;
+          camera.rotation.y += (mouseX - camera.rotation.y) * 0.05;
+
+          renderer.render(scene, camera);
+          animationId = requestAnimationFrame(animate);
+        }
+
+        function start() {
+          if (isActive) return;
+          isActive = true;
+          
+          if (!renderer) {
+            init();
+          }
+          
+          window.addEventListener('resize', handleResize);
+          animate();
+          console.log('[LAYER2] Text tunnel started');
+        }
+
+        function stop() {
+          isActive = false;
+          window.removeEventListener('resize', handleResize);
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+          }
+          console.log('[LAYER2] Text tunnel stopped');
+        }
+
+        function cleanup() {
+          stop();
+          document.removeEventListener('mousemove', handleMouseMove);
+          
+          if (renderer) {
+            renderer.dispose();
+            if (container.contains(renderer.domElement)) {
+              container.removeChild(renderer.domElement);
+            }
+          }
+          
+          sprites.forEach(sprite => {
+            if (sprite.material.map) sprite.material.map.dispose();
+            sprite.material.dispose();
+          });
+          sprites = [];
+          
+          if (particleSystem) {
+            particleSystem.geometry.dispose();
+            particleSystem.material.dispose();
+          }
+          
+          scene = null;
+          camera = null;
+          renderer = null;
+        }
+
+        // Watch for layer changes
+        function checkLayer() {
+          const isLayer2 = document.body.classList.contains('layer-2');
+          if (isLayer2 && !isActive) {
+            start();
+          } else if (!isLayer2 && isActive) {
+            stop();
+          }
+        }
+
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+              checkLayer();
+            }
+          });
+        });
+        
+        observer.observe(document.body, { attributes: true });
+        
+        // Initial check
+        checkLayer();
+        
+        console.log('[LAYER2] Text tunnel system initialized');
+      }).catch(err => {
+        console.warn('[LAYER2] Three.js failed to load:', err);
+      });
+    </script>
+
     <!-- ============ LAYER 3 CRYSTALLINE SPHERE SYSTEM ============ -->
     <script>
       /**
@@ -1583,6 +2032,208 @@ import '../styles/global.css';
         checkLayer();
         
         console.log('[LAYER3] Crystalline sphere system initialized');
+      })();
+    </script>
+
+    <!-- ============ LAYER 4 WATER RIPPLE & CONSTELLATION SYSTEM ============ -->
+    <script>
+      /**
+       * Layer 4 Visual - Water Ripples with Constellation Connections
+       * Only runs when Layer 4 is active, pauses otherwise
+       */
+      (function() {
+        const canvas = document.getElementById('l4-pond-canvas');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let ripples = [];
+        let mouse = { x: -1000, y: -1000 };
+        let animationId = null;
+        let isActive = false;
+        
+        const maxRipples = 12;
+        const connectionDistance = 300;
+        
+        // Cap DPR for performance
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+
+        // Ripple class
+        function Ripple(x, y, isClick) {
+          this.x = x;
+          this.y = y;
+          this.age = 0;
+          this.maxAge = isClick ? 200 : 120;
+          this.radius = 0;
+          this.strength = isClick ? 2.5 : 1.0;
+          this.opacity = 1.0;
+          this.rings = isClick ? 3 : 2;
+        }
+
+        Ripple.prototype.update = function() {
+          this.age++;
+          this.opacity = 1 - (this.age / this.maxAge);
+          this.radius += 1.2;
+        };
+
+        Ripple.prototype.draw = function() {
+          for (var i = 0; i < this.rings; i++) {
+            var r = this.radius - (i * 20);
+            if (r > 0) {
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+              ctx.strokeStyle = 'rgba(165, 243, 252, ' + (this.opacity * (0.2 / (i + 1))) + ')';
+              ctx.lineWidth = 1.5;
+              ctx.stroke();
+            }
+          }
+          
+          // Draw center point (star) - larger and brighter
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, 4 * this.opacity, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 255, 255, ' + (this.opacity * 0.8) + ')';
+          ctx.fill();
+          
+          // Add glow around center point
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, 8 * this.opacity, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(165, 243, 252, ' + (this.opacity * 0.2) + ')';
+          ctx.fill();
+        };
+
+        function resize() {
+          width = window.innerWidth;
+          height = window.innerHeight;
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          canvas.style.width = width + 'px';
+          canvas.style.height = height + 'px';
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function handleMouseMove(e) {
+          mouse.x = e.clientX;
+          mouse.y = e.clientY;
+          
+          // Create subtle ripples on movement (reduced frequency)
+          if (isActive && Math.random() > 0.94) {
+            ripples.push(new Ripple(mouse.x, mouse.y, false));
+            // Limit ripple count
+            while (ripples.length > maxRipples) {
+              ripples.shift();
+            }
+          }
+        }
+
+        function handleMouseDown(e) {
+          if (!isActive) return;
+          ripples.push(new Ripple(e.clientX, e.clientY, true));
+          while (ripples.length > maxRipples) {
+            ripples.shift();
+          }
+        }
+
+        function drawConstellations() {
+          for (var i = 0; i < ripples.length; i++) {
+            for (var j = i + 1; j < ripples.length; j++) {
+              var dx = ripples[i].x - ripples[j].x;
+              var dy = ripples[i].y - ripples[j].y;
+              var dist = Math.sqrt(dx * dx + dy * dy);
+
+              if (dist < connectionDistance) {
+                var alpha = (1 - dist / connectionDistance) * 0.35 * Math.min(ripples[i].opacity, ripples[j].opacity);
+                ctx.beginPath();
+                ctx.moveTo(ripples[i].x, ripples[i].y);
+                ctx.lineTo(ripples[j].x, ripples[j].y);
+                ctx.strokeStyle = 'rgba(165, 243, 252, ' + alpha + ')';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+              }
+            }
+          }
+        }
+
+        function animate() {
+          if (!isActive) {
+            animationId = null;
+            return;
+          }
+
+          // Semi-transparent clear for trail effect (pond stillness)
+          ctx.fillStyle = 'rgba(2, 6, 23, 0.15)';
+          ctx.fillRect(0, 0, width, height);
+
+          // Update and draw ripples
+          ripples = ripples.filter(function(r) { return r.age < r.maxAge; });
+          ripples.forEach(function(r) {
+            r.update();
+            r.draw();
+          });
+
+          // Draw constellation connections
+          drawConstellations();
+
+          // Mouse position glow
+          var grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 150);
+          grad.addColorStop(0, 'rgba(165, 243, 252, 0.05)');
+          grad.addColorStop(1, 'rgba(165, 243, 252, 0)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, width, height);
+
+          animationId = requestAnimationFrame(animate);
+        }
+
+        function start() {
+          if (isActive) return;
+          isActive = true;
+          resize();
+          window.addEventListener('resize', resize);
+          window.addEventListener('mousemove', handleMouseMove);
+          window.addEventListener('mousedown', handleMouseDown);
+          animate();
+          console.log('[LAYER4] Water ripple started');
+        }
+
+        function stop() {
+          isActive = false;
+          window.removeEventListener('resize', resize);
+          window.removeEventListener('mousemove', handleMouseMove);
+          window.removeEventListener('mousedown', handleMouseDown);
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+          }
+          // Clear canvas
+          ctx.clearRect(0, 0, width, height);
+          ripples = [];
+          console.log('[LAYER4] Water ripple stopped');
+        }
+
+        // Watch for layer changes
+        function checkLayer() {
+          var isLayer4 = document.body.classList.contains('layer-4');
+          if (isLayer4 && !isActive) {
+            start();
+          } else if (!isLayer4 && isActive) {
+            stop();
+          }
+        }
+
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+              checkLayer();
+            }
+          });
+        });
+        
+        observer.observe(document.body, { attributes: true });
+        
+        // Initial check
+        checkLayer();
+        
+        console.log('[LAYER4] Water ripple system initialized');
       })();
     </script>
   </body>
