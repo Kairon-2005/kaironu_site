@@ -7,8 +7,11 @@ import '../styles/global.css';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-black text-white overflow-hidden select-none">
+  <body class="bg-black overflow-hidden select-none">
     <!-- Noise overlay -->
     <div id="noise" class="fixed inset-0 z-0 pointer-events-none opacity-[0.03]"></div>
 
@@ -37,109 +40,45 @@ import '../styles/global.css';
           <div class="layer-content">
             <div class="layer-bg layer-bg-void"></div>
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
-              <h1 class="glow-text text-5xl md:text-7xl font-bold mb-6 tracking-tight">
-                <span class="text-gradient">Welcome</span>
-              </h1>
-              <p class="text-gray-400/80 text-lg md:text-xl max-w-md mb-12 tracking-wide">
-                Press <span class="key-glow">Enter</span> to begin your journey
-              </p>
-              <p class="text-gray-600/60 text-sm">
-                or <span class="key-glow text-xs">F</span> to fall through the void
-              </p>
+              <h1 class="gate-text text-6xl md:text-8xl">Welcome</h1>
             </div>
           </div>
         </div>
 
-        <!-- Layer 2: Monolith / Archive -->
+        <!-- Layer 2: Writings -->
         <div class="layer" data-layer="2" data-route="/writings">
           <div class="layer-content">
             <div class="layer-bg layer-bg-monolith"></div>
             <div class="monolith-shapes"></div>
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
-              <div class="sigil-icon mb-8">
-                <svg viewBox="0 0 100 100" class="w-20 h-20 md:w-28 md:h-28">
-                  <rect x="35" y="10" width="30" height="80" fill="none" stroke="url(#sigil-grad)" stroke-width="1" opacity="0.6"/>
-                  <line x1="50" y1="25" x2="50" y2="75" stroke="url(#sigil-grad)" stroke-width="0.5" opacity="0.4"/>
-                  <defs>
-                    <linearGradient id="sigil-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stop-color="#a5b4fc"/>
-                      <stop offset="100%" stop-color="#6366f1"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <h2 class="glow-text text-4xl md:text-6xl font-bold mb-4">
-                <span class="text-gradient-indigo">Writings</span>
-              </h2>
-              <p class="text-gray-400/70 text-lg max-w-md mb-10">Long-form thoughts etched in light</p>
-              <a href="/writings" class="gate-sigil group" data-gate>
-                <span class="gate-sigil-text">Enter the Archive</span>
-                <span class="gate-sigil-glow"></span>
+              <a href="/writings" class="gate-link" data-gate>
+                <span class="gate-text text-6xl md:text-8xl">Writings</span>
               </a>
             </div>
           </div>
         </div>
 
-        <!-- Layer 3: Debris Field -->
+        <!-- Layer 3: Fragments -->
         <div class="layer" data-layer="3" data-route="/fragments">
           <div class="layer-content">
             <div class="layer-bg layer-bg-debris"></div>
             <div class="debris-particles"></div>
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
-              <div class="sigil-icon mb-8">
-                <svg viewBox="0 0 100 100" class="w-20 h-20 md:w-28 md:h-28">
-                  <polygon points="50,15 58,40 85,40 63,55 73,85 50,65 27,85 37,55 15,40 42,40" fill="none" stroke="url(#sigil-grad-emerald)" stroke-width="1" opacity="0.6"/>
-                  <circle cx="50" cy="50" r="8" fill="none" stroke="url(#sigil-grad-emerald)" stroke-width="0.5" opacity="0.4"/>
-                  <defs>
-                    <linearGradient id="sigil-grad-emerald" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#6ee7b7"/>
-                      <stop offset="100%" stop-color="#059669"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <h2 class="glow-text text-4xl md:text-6xl font-bold mb-4">
-                <span class="text-gradient-emerald">Fragments</span>
-              </h2>
-              <p class="text-gray-400/70 text-lg max-w-md mb-10">Scattered thoughts drifting in the void</p>
-              <a href="/fragments" class="gate-sigil group" data-gate>
-                <span class="gate-sigil-text">Enter the Field</span>
-                <span class="gate-sigil-glow"></span>
+              <a href="/fragments" class="gate-link" data-gate>
+                <span class="gate-text text-6xl md:text-8xl">Fragments</span>
               </a>
             </div>
           </div>
         </div>
 
-        <!-- Layer 4: Beacon -->
+        <!-- Layer 4: Message -->
         <div class="layer" data-layer="4" data-route="/message">
           <div class="layer-content">
             <div class="layer-bg layer-bg-beacon"></div>
             <div class="beacon-rays"></div>
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
-              <div class="sigil-icon mb-8">
-                <svg viewBox="0 0 100 100" class="w-20 h-20 md:w-28 md:h-28">
-                  <circle cx="50" cy="50" r="25" fill="none" stroke="url(#sigil-grad-amber)" stroke-width="1" opacity="0.6"/>
-                  <circle cx="50" cy="50" r="12" fill="none" stroke="url(#sigil-grad-amber)" stroke-width="1" opacity="0.4"/>
-                  <circle cx="50" cy="50" r="4" fill="url(#sigil-grad-amber)" opacity="0.8"/>
-                  <line x1="50" y1="10" x2="50" y2="25" stroke="url(#sigil-grad-amber)" stroke-width="0.5" opacity="0.3"/>
-                  <line x1="50" y1="75" x2="50" y2="90" stroke="url(#sigil-grad-amber)" stroke-width="0.5" opacity="0.3"/>
-                  <line x1="10" y1="50" x2="25" y2="50" stroke="url(#sigil-grad-amber)" stroke-width="0.5" opacity="0.3"/>
-                  <line x1="75" y1="50" x2="90" y2="50" stroke="url(#sigil-grad-amber)" stroke-width="0.5" opacity="0.3"/>
-                  <defs>
-                    <linearGradient id="sigil-grad-amber" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#fcd34d"/>
-                      <stop offset="100%" stop-color="#f59e0b"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <h2 class="glow-text text-4xl md:text-6xl font-bold mb-4">
-                <span class="text-gradient-amber">Message</span>
-              </h2>
-              <p class="text-gray-400/70 text-lg max-w-md mb-10">Send a signal into the dark</p>
-              <a href="/message" class="gate-sigil group" data-gate>
-                <span class="gate-sigil-text">Transmit</span>
-                <span class="gate-sigil-glow"></span>
+              <a href="/message" class="gate-link" data-gate>
+                <span class="gate-text text-6xl md:text-8xl">Message</span>
               </a>
             </div>
           </div>
@@ -147,23 +86,13 @@ import '../styles/global.css';
       </div>
     </div>
 
-    <!-- Debug layer indicator -->
-    <div id="layer-debug" class="fixed top-4 right-4 z-50 text-gray-600/40 text-xs font-mono">
-      LAYER <span id="layer-num">1</span>/4
-    </div>
-
-    <!-- Navigation hints -->
-    <div id="nav-hint" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 text-center">
-      <div class="desktop-hint hidden md:block text-gray-500/60 text-sm space-y-1">
-        <div><span class="key-glow">Enter</span> warp forward · <span class="key-glow">F</span> or <span class="key-glow">Space</span> fall</div>
-        <div class="text-gray-600/40 text-xs"><span class="key-glow text-xs">WASD</span> / <span class="key-glow text-xs">Arrows</span> drift</div>
-      </div>
-      <div class="mobile-hint md:hidden text-gray-500/60 text-sm">
-        Tap to continue · Long-press to fall
-      </div>
-    </div>
-
     <style>
+      :root {
+        --warm-white: #F5F2EA;
+        --warm-white-dim: rgba(245, 242, 234, 0.5);
+        --warm-white-glow: rgba(245, 242, 234, 0.15);
+      }
+
       /* Noise texture */
       #noise {
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
@@ -173,120 +102,51 @@ import '../styles/global.css';
       .bloom-orb {
         position: absolute;
         border-radius: 50%;
-        filter: blur(80px);
+        filter: blur(100px);
         opacity: 0;
-        transition: opacity 1s ease, transform 2s ease;
+        transition: opacity 1.5s ease, transform 3s ease;
       }
       .bloom-1 {
-        width: 400px; height: 400px;
-        background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(245,242,234,0.08) 0%, transparent 70%);
         top: 20%; left: 10%;
       }
       .bloom-2 {
-        width: 300px; height: 300px;
-        background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+        width: 400px; height: 400px;
+        background: radial-gradient(circle, rgba(245,242,234,0.06) 0%, transparent 70%);
         bottom: 20%; right: 15%;
       }
       .bloom-3 {
-        width: 350px; height: 350px;
-        background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%);
+        width: 450px; height: 450px;
+        background: radial-gradient(circle, rgba(245,242,234,0.07) 0%, transparent 70%);
         top: 50%; left: 50%; transform: translate(-50%, -50%);
       }
       body.layer-2 .bloom-1 { opacity: 1; }
       body.layer-3 .bloom-2 { opacity: 1; }
       body.layer-4 .bloom-3 { opacity: 1; }
-      body.transitioning .bloom-orb { opacity: 0.5; transform: scale(1.3); }
+      body.transitioning .bloom-orb { opacity: 0.3; transform: scale(1.5); }
 
-      /* Luminous text */
-      .glow-text {
-        text-shadow: 0 0 40px rgba(255,255,255,0.1), 0 0 80px rgba(255,255,255,0.05);
-      }
-      .text-gradient {
-        background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 50%, #cbd5e1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-      .text-gradient-indigo {
-        background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 50%, #818cf8 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-      .text-gradient-emerald {
-        background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 50%, #34d399 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-      .text-gradient-amber {
-        background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+      /* Gate typography */
+      .gate-text {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 300;
+        font-style: italic;
+        color: var(--warm-white);
+        text-shadow: 0 0 60px var(--warm-white-glow), 0 0 120px var(--warm-white-glow);
+        letter-spacing: 0.05em;
+        transition: all 0.6s ease;
       }
 
-      /* Key hint glow */
-      .key-glow {
+      .gate-link {
         display: inline-block;
-        padding: 2px 8px;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 4px;
-        font-family: monospace;
-        font-size: 0.85em;
-        text-shadow: 0 0 10px rgba(255,255,255,0.3);
-      }
-
-      /* Gate sigil */
-      .gate-sigil {
-        position: relative;
-        display: inline-block;
-        padding: 16px 32px;
-        background: transparent;
-        border: 1px solid rgba(255,255,255,0.15);
-        border-radius: 2px;
-        overflow: hidden;
-        transition: all 0.4s ease;
         cursor: pointer;
-      }
-      .gate-sigil:hover {
-        border-color: rgba(255,255,255,0.3);
-        box-shadow: 0 0 30px rgba(255,255,255,0.1), inset 0 0 30px rgba(255,255,255,0.03);
-      }
-      .gate-sigil-text {
-        position: relative;
-        z-index: 1;
-        font-size: 0.9rem;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.7);
-        text-shadow: 0 0 20px rgba(255,255,255,0.5);
-        transition: all 0.4s ease;
-      }
-      .gate-sigil:hover .gate-sigil-text {
-        color: rgba(255,255,255,0.95);
-        text-shadow: 0 0 30px rgba(255,255,255,0.8);
-      }
-      .gate-sigil-glow {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
-        transform: translateX(-100%);
         transition: transform 0.6s ease;
       }
-      .gate-sigil:hover .gate-sigil-glow {
-        transform: translateX(100%);
+      .gate-link:hover {
+        transform: scale(1.02);
       }
-
-      /* Sigil icon glow */
-      .sigil-icon {
-        filter: drop-shadow(0 0 20px currentColor);
-        animation: sigil-pulse 4s ease-in-out infinite;
-      }
-      @keyframes sigil-pulse {
-        0%, 100% { opacity: 0.6; transform: scale(1); }
-        50% { opacity: 0.8; transform: scale(1.02); }
+      .gate-link:hover .gate-text {
+        text-shadow: 0 0 80px rgba(245,242,234,0.25), 0 0 160px var(--warm-white-glow);
       }
 
       /* Layer backgrounds */
@@ -295,56 +155,57 @@ import '../styles/global.css';
         inset: 0;
       }
       .layer-bg-void {
-        background: radial-gradient(ellipse at center, #0a0a0f 0%, #000000 100%);
+        background: radial-gradient(ellipse at center, #080808 0%, #000000 100%);
       }
       .layer-bg-monolith {
         background:
-          radial-gradient(ellipse at 30% 70%, rgba(99,102,241,0.08) 0%, transparent 50%),
-          radial-gradient(ellipse at center, #0a0a12 0%, #000005 100%);
+          radial-gradient(ellipse at 30% 70%, rgba(245,242,234,0.03) 0%, transparent 50%),
+          radial-gradient(ellipse at center, #060606 0%, #000000 100%);
       }
       .layer-bg-debris {
         background:
-          radial-gradient(ellipse at 70% 30%, rgba(16,185,129,0.06) 0%, transparent 50%),
-          radial-gradient(ellipse at 30% 80%, rgba(6,78,59,0.08) 0%, transparent 40%),
-          radial-gradient(ellipse at center, #050a08 0%, #000000 100%);
+          radial-gradient(ellipse at 70% 30%, rgba(245,242,234,0.025) 0%, transparent 50%),
+          radial-gradient(ellipse at 30% 80%, rgba(245,242,234,0.02) 0%, transparent 40%),
+          radial-gradient(ellipse at center, #050505 0%, #000000 100%);
       }
       .layer-bg-beacon {
         background:
-          radial-gradient(ellipse at center, rgba(245,158,11,0.1) 0%, transparent 40%),
-          radial-gradient(ellipse at center, #0f0a05 0%, #000000 100%);
+          radial-gradient(ellipse at center, rgba(245,242,234,0.04) 0%, transparent 40%),
+          radial-gradient(ellipse at center, #070705 0%, #000000 100%);
       }
 
-      /* Decorative elements */
+      /* Subtle decorative elements */
       .monolith-shapes {
         position: absolute;
         inset: 0;
-        background:
-          linear-gradient(180deg, transparent 45%, rgba(99,102,241,0.02) 50%, transparent 55%);
+        background: linear-gradient(180deg, transparent 48%, rgba(245,242,234,0.01) 50%, transparent 52%);
         pointer-events: none;
       }
       .debris-particles {
         position: absolute;
         inset: 0;
         background-image:
-          radial-gradient(1px 1px at 20% 30%, rgba(16,185,129,0.3), transparent),
-          radial-gradient(1px 1px at 80% 20%, rgba(16,185,129,0.2), transparent),
-          radial-gradient(1px 1px at 40% 70%, rgba(16,185,129,0.25), transparent),
-          radial-gradient(1px 1px at 60% 50%, rgba(16,185,129,0.2), transparent),
-          radial-gradient(2px 2px at 90% 80%, rgba(16,185,129,0.15), transparent);
+          radial-gradient(1px 1px at 20% 30%, rgba(245,242,234,0.15), transparent),
+          radial-gradient(1px 1px at 80% 20%, rgba(245,242,234,0.1), transparent),
+          radial-gradient(1px 1px at 40% 70%, rgba(245,242,234,0.12), transparent),
+          radial-gradient(1px 1px at 60% 50%, rgba(245,242,234,0.08), transparent);
         pointer-events: none;
-        animation: debris-drift 20s linear infinite;
+        animation: debris-drift 30s linear infinite;
       }
       @keyframes debris-drift {
         0% { transform: translate(0, 0); }
-        100% { transform: translate(-20px, 20px); }
+        100% { transform: translate(-30px, 30px); }
       }
       .beacon-rays {
         position: absolute;
         inset: 0;
-        background:
-          conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(245,158,11,0.02) 10deg, transparent 20deg, transparent 90deg, rgba(245,158,11,0.02) 100deg, transparent 110deg, transparent 180deg, rgba(245,158,11,0.02) 190deg, transparent 200deg, transparent 270deg, rgba(245,158,11,0.02) 280deg, transparent 290deg);
+        background: conic-gradient(from 0deg at 50% 50%,
+          transparent 0deg, rgba(245,242,234,0.015) 10deg, transparent 20deg,
+          transparent 90deg, rgba(245,242,234,0.015) 100deg, transparent 110deg,
+          transparent 180deg, rgba(245,242,234,0.015) 190deg, transparent 200deg,
+          transparent 270deg, rgba(245,242,234,0.015) 280deg, transparent 290deg);
         pointer-events: none;
-        animation: beacon-rotate 30s linear infinite;
+        animation: beacon-rotate 40s linear infinite;
       }
       @keyframes beacon-rotate {
         0% { transform: rotate(0deg); }
@@ -378,47 +239,120 @@ import '../styles/global.css';
 
       /* Idle float */
       .layer.active:not(.transitioning) .layer-inner {
-        animation: idle-float 8s ease-in-out infinite;
+        animation: idle-float 10s ease-in-out infinite;
       }
       @keyframes idle-float {
         0%, 100% { transform: translateY(0) scale(1); }
-        50% { transform: translateY(-6px) scale(1.001); }
+        50% { transform: translateY(-8px) scale(1.002); }
       }
 
-      /* Warp transition */
+      /* Warp transition - slower, smoother */
       .layer-content.warp-out {
-        animation: warp-out 900ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        animation: warp-out 1100ms cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
       }
       .layer-content.warp-in {
-        animation: warp-in 900ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        animation: warp-in 1100ms cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
       }
       @keyframes warp-out {
-        0% { transform: scale(1) translateZ(0); filter: blur(0) brightness(1); opacity: 1; }
-        50% { transform: scale(1.8) translateZ(200px); filter: blur(6px) brightness(1.5); opacity: 0.7; }
-        100% { transform: scale(4) translateZ(500px); filter: blur(16px) brightness(2); opacity: 0; }
+        0% {
+          transform: scale(1) translateZ(0);
+          filter: blur(0) brightness(1);
+          opacity: 1;
+        }
+        35% {
+          transform: scale(1.4) translateZ(100px);
+          filter: blur(3px) brightness(1.2);
+          opacity: 0.85;
+        }
+        70% {
+          transform: scale(2.5) translateZ(300px);
+          filter: blur(10px) brightness(1.6);
+          opacity: 0.4;
+        }
+        100% {
+          transform: scale(4) translateZ(500px);
+          filter: blur(16px) brightness(2);
+          opacity: 0;
+        }
       }
       @keyframes warp-in {
-        0% { transform: scale(0.2) translateZ(-500px); filter: blur(16px) brightness(0.3); opacity: 0; }
-        50% { transform: scale(0.7) translateZ(-100px); filter: blur(4px) brightness(0.8); opacity: 0.7; }
-        100% { transform: scale(1) translateZ(0); filter: blur(0) brightness(1); opacity: 1; }
+        0% {
+          transform: scale(0.15) translateZ(-500px);
+          filter: blur(16px) brightness(0.2);
+          opacity: 0;
+        }
+        30% {
+          transform: scale(0.5) translateZ(-200px);
+          filter: blur(8px) brightness(0.5);
+          opacity: 0.4;
+        }
+        65% {
+          transform: scale(0.85) translateZ(-50px);
+          filter: blur(2px) brightness(0.9);
+          opacity: 0.85;
+        }
+        100% {
+          transform: scale(1) translateZ(0);
+          filter: blur(0) brightness(1);
+          opacity: 1;
+        }
       }
 
-      /* Rift fall transition */
+      /* Rift fall transition - slower, more dramatic */
       .layer-content.rift-out {
-        animation: rift-out 700ms cubic-bezier(0.6, 0, 1, 1) forwards;
+        animation: rift-out 900ms cubic-bezier(0.55, 0.05, 0.67, 0.19) forwards;
       }
       .layer-content.rift-in {
-        animation: rift-in 800ms cubic-bezier(0, 0, 0.2, 1) forwards;
+        animation: rift-in 1100ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
       }
       @keyframes rift-out {
-        0% { transform: translateY(0) rotate(0deg) scale(1); filter: blur(0) brightness(1); opacity: 1; }
-        30% { transform: translateY(50px) rotate(2deg) scale(0.95); filter: blur(2px) brightness(0.7); opacity: 0.8; }
-        100% { transform: translateY(300px) rotate(5deg) scale(0.7); filter: blur(12px) brightness(0.2); opacity: 0; }
+        0% {
+          transform: translateY(0) rotate(0deg) scale(1);
+          filter: blur(0) brightness(1);
+          opacity: 1;
+        }
+        25% {
+          transform: translateY(30px) rotate(1deg) scale(0.98);
+          filter: blur(1px) brightness(0.8);
+          opacity: 0.9;
+        }
+        60% {
+          transform: translateY(150px) rotate(3deg) scale(0.85);
+          filter: blur(6px) brightness(0.4);
+          opacity: 0.5;
+        }
+        100% {
+          transform: translateY(400px) rotate(6deg) scale(0.6);
+          filter: blur(14px) brightness(0.1);
+          opacity: 0;
+        }
       }
       @keyframes rift-in {
-        0% { transform: translateY(-300px) rotate(-3deg) scale(0.7); filter: blur(12px) brightness(0.2); opacity: 0; }
-        60% { transform: translateY(20px) rotate(1deg) scale(1.02); filter: blur(2px) brightness(0.9); opacity: 0.9; }
-        100% { transform: translateY(0) rotate(0deg) scale(1); filter: blur(0) brightness(1); opacity: 1; }
+        0% {
+          transform: translateY(-400px) rotate(-4deg) scale(0.6);
+          filter: blur(14px) brightness(0.1);
+          opacity: 0;
+        }
+        40% {
+          transform: translateY(-50px) rotate(-1deg) scale(0.95);
+          filter: blur(4px) brightness(0.7);
+          opacity: 0.7;
+        }
+        70% {
+          transform: translateY(15px) rotate(0.5deg) scale(1.01);
+          filter: blur(1px) brightness(0.95);
+          opacity: 0.95;
+        }
+        85% {
+          transform: translateY(-5px) rotate(-0.2deg) scale(1.005);
+          filter: blur(0) brightness(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(0) rotate(0deg) scale(1);
+          filter: blur(0) brightness(1);
+          opacity: 1;
+        }
       }
 
       /* FX overlays */
@@ -426,42 +360,42 @@ import '../styles/global.css';
         position: absolute;
         top: 50%; left: 50%;
         width: 0; height: 0;
-        background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+        background: radial-gradient(circle, rgba(245,242,234,0.6) 0%, rgba(245,242,234,0) 70%);
         border-radius: 50%;
         transform: translate(-50%, -50%);
         opacity: 0;
-        transition: all 0.3s ease;
+        transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
       }
       .warp-glow.active {
-        width: 300px; height: 300px;
-        opacity: 0.4;
+        width: 400px; height: 400px;
+        opacity: 0.3;
       }
 
       .rift-slit {
         position: absolute;
         top: 0; left: 50%;
-        width: 4px; height: 100%;
-        background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.9) 70%, transparent 100%);
+        width: 3px; height: 100%;
+        background: linear-gradient(180deg, transparent 0%, rgba(245,242,234,0.7) 30%, rgba(245,242,234,0.7) 70%, transparent 100%);
         transform: translateX(-50%) scaleY(0);
         opacity: 0;
         filter: blur(2px);
-        box-shadow: 0 0 30px 10px rgba(255,255,255,0.3);
+        box-shadow: 0 0 40px 15px rgba(245,242,234,0.2);
       }
       .rift-slit.active {
-        animation: rift-slit-flash 0.4s ease-out forwards;
+        animation: rift-slit-flash 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
       }
       @keyframes rift-slit-flash {
         0% { transform: translateX(-50%) scaleY(0); opacity: 0; }
-        30% { transform: translateX(-50%) scaleY(1); opacity: 1; }
+        25% { transform: translateX(-50%) scaleY(1); opacity: 1; }
         100% { transform: translateX(-50%) scaleY(0); opacity: 0; }
       }
 
       .vignette {
         position: absolute;
         inset: 0;
-        background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+        background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.7) 100%);
         opacity: 0;
-        transition: opacity 0.4s ease;
+        transition: opacity 0.6s ease;
       }
       .vignette.active {
         opacity: 1;
@@ -469,17 +403,7 @@ import '../styles/global.css';
 
       /* Drift container */
       #drift-container {
-        transition: transform 0.1s ease-out;
-      }
-
-      /* Hide hints during transition */
-      body.transitioning #nav-hint {
-        opacity: 0;
-        transition: opacity 0.2s;
-      }
-      body:not(.transitioning) #nav-hint {
-        opacity: 1;
-        transition: opacity 0.4s 0.6s;
+        transition: transform 0.15s ease-out;
       }
     </style>
 
@@ -490,20 +414,20 @@ import '../styles/global.css';
       const totalLayers = 4;
 
       // Drift state
-      const drift = { x: 0, y: 0, targetX: 0, targetY: 0, vx: 0, vy: 0 };
+      const drift = { x: 0, y: 0, vx: 0, vy: 0 };
       const keys = { up: false, down: false, left: false, right: false };
-      const driftSpeed = 0.8;
-      const driftFriction = 0.92;
-      const driftMax = 60;
+      const driftSpeed = 0.6;
+      const driftFriction = 0.94;
+      const driftMax = 50;
       const mouseParallax = { x: 0, y: 0 };
 
       // Star state
       let stars = [];
-      let starSpeed = 0.3;
-      let targetStarSpeed = 0.3;
-      const baseStarSpeed = 0.3;
-      const warpStarSpeed = 20;
-      const fallStarSpeed = 8;
+      let starSpeed = 0.2;
+      let targetStarSpeed = 0.2;
+      const baseStarSpeed = 0.2;
+      const warpStarSpeed = 12;
+      const fallStarSpeed = 6;
 
       // Mobile state
       let longPressTimer = null;
@@ -514,11 +438,16 @@ import '../styles/global.css';
       let lastClickTime = 0;
       const doubleClickThreshold = 300;
 
+      // Timing constants (slower)
+      const warpDuration = 2200;
+      const warpMidpoint = 1100;
+      const fallDuration = 2000;
+      const fallMidpoint = 900;
+
       // ============ ELEMENTS ============
       const canvas = document.getElementById('stars');
       const ctx = canvas.getContext('2d');
       const driftContainer = document.getElementById('drift-container');
-      const layerDebug = document.getElementById('layer-num');
       const warpGlow = document.getElementById('warp-glow');
       const riftSlit = document.getElementById('rift-slit');
       const vignette = document.getElementById('vignette');
@@ -529,28 +458,28 @@ import '../styles/global.css';
         canvas.height = window.innerHeight;
       }
 
-      function createStars(count = 250) {
+      function createStars(count = 200) {
         stars = [];
         for (let i = 0; i < count; i++) {
           stars.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
             z: Math.random() * 1000,
-            size: Math.random() * 1.2 + 0.3,
-            brightness: Math.random() * 0.4 + 0.3
+            size: Math.random() * 1 + 0.2,
+            brightness: Math.random() * 0.3 + 0.2
           });
         }
       }
 
       function drawStars() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         const centerX = canvas.width / 2 + drift.x * 0.5;
         const centerY = canvas.height / 2 + drift.y * 0.5;
 
         stars.forEach(star => {
-          star.z -= starSpeed * 8;
+          star.z -= starSpeed * 6;
           if (star.z <= 0) {
             star.z = 1000;
             star.x = Math.random() * canvas.width;
@@ -560,58 +489,57 @@ import '../styles/global.css';
           const scale = 800 / star.z;
           const x = (star.x - centerX) * scale + centerX;
           const y = (star.y - centerY) * scale + centerY;
-          const size = Math.max(0.5, star.size * scale * (starSpeed > 3 ? 1 + (starSpeed - 3) * 0.2 : 1));
+          const size = Math.max(0.3, star.size * scale * (starSpeed > 2 ? 1 + (starSpeed - 2) * 0.15 : 1));
 
-          if (starSpeed > 3) {
-            const prevZ = star.z + starSpeed * 8;
+          // Warm white color
+          const warmR = 245, warmG = 242, warmB = 234;
+
+          if (starSpeed > 2) {
+            const prevZ = star.z + starSpeed * 6;
             const prevScale = 800 / prevZ;
             const prevX = (star.x - centerX) * prevScale + centerX;
             const prevY = (star.y - centerY) * prevScale + centerY;
 
             const grad = ctx.createLinearGradient(prevX, prevY, x, y);
-            grad.addColorStop(0, 'rgba(255,255,255,0)');
-            grad.addColorStop(1, `rgba(255,255,255,${star.brightness * 0.7})`);
+            grad.addColorStop(0, `rgba(${warmR},${warmG},${warmB},0)`);
+            grad.addColorStop(1, `rgba(${warmR},${warmG},${warmB},${star.brightness * 0.6})`);
 
             ctx.beginPath();
             ctx.strokeStyle = grad;
-            ctx.lineWidth = size * 0.6;
+            ctx.lineWidth = size * 0.5;
             ctx.moveTo(prevX, prevY);
             ctx.lineTo(x, y);
             ctx.stroke();
           }
 
           ctx.beginPath();
-          ctx.fillStyle = `rgba(255,255,255,${star.brightness})`;
+          ctx.fillStyle = `rgba(${warmR},${warmG},${warmB},${star.brightness})`;
           ctx.arc(x, y, size, 0, Math.PI * 2);
           ctx.fill();
         });
 
-        starSpeed += (targetStarSpeed - starSpeed) * 0.06;
+        // Slower interpolation for smoother feel
+        starSpeed += (targetStarSpeed - starSpeed) * 0.04;
       }
 
       // ============ DRIFT SYSTEM ============
       function updateDrift() {
-        // Apply key input
         if (keys.up) drift.vy -= driftSpeed;
         if (keys.down) drift.vy += driftSpeed;
         if (keys.left) drift.vx -= driftSpeed;
         if (keys.right) drift.vx += driftSpeed;
 
-        // Apply friction
         drift.vx *= driftFriction;
         drift.vy *= driftFriction;
 
-        // Update position
         drift.x += drift.vx;
         drift.y += drift.vy;
 
-        // Clamp
         drift.x = Math.max(-driftMax, Math.min(driftMax, drift.x));
         drift.y = Math.max(-driftMax, Math.min(driftMax, drift.y));
 
-        // Add mouse parallax
-        const finalX = drift.x + mouseParallax.x * 15;
-        const finalY = drift.y + mouseParallax.y * 15;
+        const finalX = drift.x + mouseParallax.x * 12;
+        const finalY = drift.y + mouseParallax.y * 12;
 
         driftContainer.style.transform = `translate(${finalX}px, ${finalY}px)`;
       }
@@ -627,7 +555,6 @@ import '../styles/global.css';
       function updateLayerClass() {
         document.body.classList.remove('layer-1', 'layer-2', 'layer-3', 'layer-4');
         document.body.classList.add(`layer-${currentLayer}`);
-        layerDebug.textContent = currentLayer;
       }
 
       function warpTransition(targetLayer) {
@@ -642,7 +569,6 @@ import '../styles/global.css';
         const currentContent = currentEl.querySelector('.layer-content');
         const targetContent = targetEl.querySelector('.layer-content');
 
-        // FX
         targetStarSpeed = warpStarSpeed;
         warpGlow.classList.add('active');
         vignette.classList.add('active');
@@ -652,7 +578,7 @@ import '../styles/global.css';
 
         setTimeout(() => {
           warpGlow.classList.remove('active');
-        }, 400);
+        }, 600);
 
         setTimeout(() => {
           currentEl.classList.remove('active');
@@ -661,7 +587,7 @@ import '../styles/global.css';
           targetContent.classList.add('warp-in');
           currentLayer = targetLayer;
           updateLayerClass();
-        }, 450);
+        }, warpMidpoint);
 
         setTimeout(() => {
           targetContent.classList.remove('warp-in');
@@ -671,13 +597,12 @@ import '../styles/global.css';
           targetStarSpeed = baseStarSpeed;
           isTransitioning = false;
           document.body.classList.remove('transitioning');
-        }, 900);
+        }, warpDuration);
       }
 
       function riftFallTransition() {
         if (isTransitioning || currentLayer === 1) return;
 
-        // Pick random layer different from current (among 2,3,4)
         const options = [2, 3, 4].filter(l => l !== currentLayer);
         const targetLayer = options[Math.floor(Math.random() * options.length)];
 
@@ -690,7 +615,6 @@ import '../styles/global.css';
         const currentContent = currentEl.querySelector('.layer-content');
         const targetContent = targetEl.querySelector('.layer-content');
 
-        // FX
         targetStarSpeed = fallStarSpeed;
         riftSlit.classList.add('active');
         vignette.classList.add('active');
@@ -700,7 +624,7 @@ import '../styles/global.css';
 
         setTimeout(() => {
           riftSlit.classList.remove('active');
-        }, 400);
+        }, 600);
 
         setTimeout(() => {
           currentEl.classList.remove('active');
@@ -709,7 +633,7 @@ import '../styles/global.css';
           targetContent.classList.add('rift-in');
           currentLayer = targetLayer;
           updateLayerClass();
-        }, 350);
+        }, fallMidpoint);
 
         setTimeout(() => {
           targetContent.classList.remove('rift-in');
@@ -719,7 +643,7 @@ import '../styles/global.css';
           targetStarSpeed = baseStarSpeed;
           isTransitioning = false;
           document.body.classList.remove('transitioning');
-        }, 800);
+        }, fallDuration);
       }
 
       function gateTransition(href) {
@@ -738,11 +662,10 @@ import '../styles/global.css';
 
         setTimeout(() => {
           window.location.href = href;
-        }, 500);
+        }, 800);
       }
 
       // ============ EVENT HANDLERS ============
-      // Keyboard
       document.addEventListener('keydown', (e) => {
         // Drift keys (do NOT change layers)
         if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') { keys.up = true; e.preventDefault(); }
@@ -759,7 +682,6 @@ import '../styles/global.css';
         if ((e.key === 'f' || e.key === 'F' || e.key === ' ') && !e.repeat) {
           e.preventDefault();
           if (currentLayer === 1) {
-            // From layer 1, warp to layer 2 first
             warpTransition(2);
           } else {
             riftFallTransition();
@@ -774,13 +696,11 @@ import '../styles/global.css';
         if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
       });
 
-      // Mouse parallax
       document.addEventListener('mousemove', (e) => {
         mouseParallax.x = (e.clientX / window.innerWidth - 0.5) * 2;
         mouseParallax.y = (e.clientY / window.innerHeight - 0.5) * 2;
       });
 
-      // Double click for fall
       document.addEventListener('click', (e) => {
         if (e.target.closest('[data-gate]')) return;
 
@@ -795,7 +715,6 @@ import '../styles/global.css';
         lastClickTime = now;
       });
 
-      // Gate clicks
       document.querySelectorAll('[data-gate]').forEach(gate => {
         gate.addEventListener('click', (e) => {
           e.preventDefault();
@@ -824,7 +743,6 @@ import '../styles/global.css';
         const duration = Date.now() - touchStartTime;
 
         if (duration < longPressDuration) {
-          // Short tap = warp forward
           warpTransition(currentLayer + 1);
         }
       }, { passive: true });
@@ -844,8 +762,7 @@ import '../styles/global.css';
         createStars();
       });
 
-      console.log('[PORTAL] Initialized. Layer 1.');
-      console.log('[CONTROLS] Enter=warp, F/Space=fall, WASD/Arrows=drift');
+      console.log('[PORTAL] Initialized');
     </script>
   </body>
 </html>
