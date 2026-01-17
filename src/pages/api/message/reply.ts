@@ -3,6 +3,8 @@ import { sql } from '@vercel/postgres';
 import { hashReplyKey } from '../../../utils/crypto';
 import { validateEnvVars } from '../../../utils/auth';
 
+export const prerender = false;
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Validate required environment variables

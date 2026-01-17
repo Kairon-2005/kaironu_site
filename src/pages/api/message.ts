@@ -3,6 +3,8 @@ import { sql } from '@vercel/postgres';
 import { createIpHash, generateReplyKey, hashReplyKey } from '../../utils/crypto';
 import { validateEnvVars } from '../../utils/auth';
 
+export const prerender = false;
+
 // Rate limiting store (in-memory fallback)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
