@@ -8,88 +8,350 @@ import '../styles/global.css';
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Home</title>
   </head>
-  <body class="bg-black text-white overflow-hidden">
+  <body class="bg-black text-white overflow-hidden select-none">
+    <!-- Noise overlay -->
+    <div id="noise" class="fixed inset-0 z-0 pointer-events-none opacity-[0.03]"></div>
+
+    <!-- Bloom overlay -->
+    <div id="bloom" class="fixed inset-0 z-[1] pointer-events-none">
+      <div class="bloom-orb bloom-1"></div>
+      <div class="bloom-orb bloom-2"></div>
+      <div class="bloom-orb bloom-3"></div>
+    </div>
+
     <!-- Star particle canvas -->
-    <canvas id="stars" class="fixed inset-0 z-0 pointer-events-none"></canvas>
+    <canvas id="stars" class="fixed inset-0 z-[2] pointer-events-none"></canvas>
 
-    <!-- Portal container -->
+    <!-- Transition effects overlay -->
+    <div id="fx-overlay" class="fixed inset-0 z-[15] pointer-events-none">
+      <div id="warp-glow" class="warp-glow"></div>
+      <div id="rift-slit" class="rift-slit"></div>
+      <div id="vignette" class="vignette"></div>
+    </div>
+
+    <!-- Portal container with drift transform -->
     <div id="portal" class="fixed inset-0 z-10">
-      <!-- Layer 1: Welcome -->
-      <div class="layer active" data-layer="1">
-        <div class="layer-content">
-          <div class="layer-bg bg-gradient-to-b from-gray-950 via-black to-gray-950"></div>
-          <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
-            <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">Welcome</h1>
-            <p class="text-gray-400 text-lg md:text-xl max-w-md mb-12">Press Enter to begin your journey</p>
-            <div class="gate-hint text-gray-600 text-sm animate-pulse">Layer 1 of 4</div>
+      <div id="drift-container" class="w-full h-full">
+        <!-- Layer 1: Calm Void -->
+        <div class="layer active" data-layer="1">
+          <div class="layer-content">
+            <div class="layer-bg layer-bg-void"></div>
+            <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
+              <h1 class="glow-text text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+                <span class="text-gradient">Welcome</span>
+              </h1>
+              <p class="text-gray-400/80 text-lg md:text-xl max-w-md mb-12 tracking-wide">
+                Press <span class="key-glow">Enter</span> to begin your journey
+              </p>
+              <p class="text-gray-600/60 text-sm">
+                or <span class="key-glow text-xs">F</span> to fall through the void
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Layer 2: Writings Gate -->
-      <div class="layer" data-layer="2" data-route="/writings">
-        <div class="layer-content">
-          <div class="layer-bg bg-gradient-to-br from-indigo-950/50 via-black to-purple-950/30"></div>
-          <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
-            <div class="gate-icon text-6xl mb-6 opacity-60">&#9998;</div>
-            <h2 class="text-4xl md:text-6xl font-bold mb-4">Writings</h2>
-            <p class="text-gray-400 text-lg max-w-md mb-8">Long-form thoughts and essays</p>
-            <a href="/writings" class="gate-button group relative px-8 py-4 border border-gray-700 rounded-lg hover:border-gray-500 hover:bg-white/5 transition-all duration-300">
-              <span class="text-lg">Enter</span>
-              <span class="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/10 to-transparent"></span>
-            </a>
-            <div class="gate-hint text-gray-600 text-sm mt-8">Layer 2 of 4</div>
+        <!-- Layer 2: Monolith / Archive -->
+        <div class="layer" data-layer="2" data-route="/writings">
+          <div class="layer-content">
+            <div class="layer-bg layer-bg-monolith"></div>
+            <div class="monolith-shapes"></div>
+            <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
+              <div class="sigil-icon mb-8">
+                <svg viewBox="0 0 100 100" class="w-20 h-20 md:w-28 md:h-28">
+                  <rect x="35" y="10" width="30" height="80" fill="none" stroke="url(#sigil-grad)" stroke-width="1" opacity="0.6"/>
+                  <line x1="50" y1="25" x2="50" y2="75" stroke="url(#sigil-grad)" stroke-width="0.5" opacity="0.4"/>
+                  <defs>
+                    <linearGradient id="sigil-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#a5b4fc"/>
+                      <stop offset="100%" stop-color="#6366f1"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <h2 class="glow-text text-4xl md:text-6xl font-bold mb-4">
+                <span class="text-gradient-indigo">Writings</span>
+              </h2>
+              <p class="text-gray-400/70 text-lg max-w-md mb-10">Long-form thoughts etched in light</p>
+              <a href="/writings" class="gate-sigil group" data-gate>
+                <span class="gate-sigil-text">Enter the Archive</span>
+                <span class="gate-sigil-glow"></span>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Layer 3: Fragments Gate -->
-      <div class="layer" data-layer="3" data-route="/fragments">
-        <div class="layer-content">
-          <div class="layer-bg bg-gradient-to-bl from-emerald-950/40 via-black to-teal-950/30"></div>
-          <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
-            <div class="gate-icon text-6xl mb-6 opacity-60">&#10022;</div>
-            <h2 class="text-4xl md:text-6xl font-bold mb-4">Fragments</h2>
-            <p class="text-gray-400 text-lg max-w-md mb-8">Scattered thoughts and quotes</p>
-            <a href="/fragments" class="gate-button group relative px-8 py-4 border border-gray-700 rounded-lg hover:border-gray-500 hover:bg-white/5 transition-all duration-300">
-              <span class="text-lg">Enter</span>
-              <span class="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/10 to-transparent"></span>
-            </a>
-            <div class="gate-hint text-gray-600 text-sm mt-8">Layer 3 of 4</div>
+        <!-- Layer 3: Debris Field -->
+        <div class="layer" data-layer="3" data-route="/fragments">
+          <div class="layer-content">
+            <div class="layer-bg layer-bg-debris"></div>
+            <div class="debris-particles"></div>
+            <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
+              <div class="sigil-icon mb-8">
+                <svg viewBox="0 0 100 100" class="w-20 h-20 md:w-28 md:h-28">
+                  <polygon points="50,15 58,40 85,40 63,55 73,85 50,65 27,85 37,55 15,40 42,40" fill="none" stroke="url(#sigil-grad-emerald)" stroke-width="1" opacity="0.6"/>
+                  <circle cx="50" cy="50" r="8" fill="none" stroke="url(#sigil-grad-emerald)" stroke-width="0.5" opacity="0.4"/>
+                  <defs>
+                    <linearGradient id="sigil-grad-emerald" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#6ee7b7"/>
+                      <stop offset="100%" stop-color="#059669"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <h2 class="glow-text text-4xl md:text-6xl font-bold mb-4">
+                <span class="text-gradient-emerald">Fragments</span>
+              </h2>
+              <p class="text-gray-400/70 text-lg max-w-md mb-10">Scattered thoughts drifting in the void</p>
+              <a href="/fragments" class="gate-sigil group" data-gate>
+                <span class="gate-sigil-text">Enter the Field</span>
+                <span class="gate-sigil-glow"></span>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Layer 4: Message Gate -->
-      <div class="layer" data-layer="4" data-route="/message">
-        <div class="layer-content">
-          <div class="layer-bg bg-gradient-to-tr from-amber-950/40 via-black to-orange-950/30"></div>
-          <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
-            <div class="gate-icon text-6xl mb-6 opacity-60">&#9993;</div>
-            <h2 class="text-4xl md:text-6xl font-bold mb-4">Message</h2>
-            <p class="text-gray-400 text-lg max-w-md mb-8">Get in touch</p>
-            <a href="/message" class="gate-button group relative px-8 py-4 border border-gray-700 rounded-lg hover:border-gray-500 hover:bg-white/5 transition-all duration-300">
-              <span class="text-lg">Enter</span>
-              <span class="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/10 to-transparent"></span>
-            </a>
-            <div class="gate-hint text-gray-600 text-sm mt-8">Layer 4 of 4</div>
+        <!-- Layer 4: Beacon -->
+        <div class="layer" data-layer="4" data-route="/message">
+          <div class="layer-content">
+            <div class="layer-bg layer-bg-beacon"></div>
+            <div class="beacon-rays"></div>
+            <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
+              <div class="sigil-icon mb-8">
+                <svg viewBox="0 0 100 100" class="w-20 h-20 md:w-28 md:h-28">
+                  <circle cx="50" cy="50" r="25" fill="none" stroke="url(#sigil-grad-amber)" stroke-width="1" opacity="0.6"/>
+                  <circle cx="50" cy="50" r="12" fill="none" stroke="url(#sigil-grad-amber)" stroke-width="1" opacity="0.4"/>
+                  <circle cx="50" cy="50" r="4" fill="url(#sigil-grad-amber)" opacity="0.8"/>
+                  <line x1="50" y1="10" x2="50" y2="25" stroke="url(#sigil-grad-amber)" stroke-width="0.5" opacity="0.3"/>
+                  <line x1="50" y1="75" x2="50" y2="90" stroke="url(#sigil-grad-amber)" stroke-width="0.5" opacity="0.3"/>
+                  <line x1="10" y1="50" x2="25" y2="50" stroke="url(#sigil-grad-amber)" stroke-width="0.5" opacity="0.3"/>
+                  <line x1="75" y1="50" x2="90" y2="50" stroke="url(#sigil-grad-amber)" stroke-width="0.5" opacity="0.3"/>
+                  <defs>
+                    <linearGradient id="sigil-grad-amber" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#fcd34d"/>
+                      <stop offset="100%" stop-color="#f59e0b"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <h2 class="glow-text text-4xl md:text-6xl font-bold mb-4">
+                <span class="text-gradient-amber">Message</span>
+              </h2>
+              <p class="text-gray-400/70 text-lg max-w-md mb-10">Send a signal into the dark</p>
+              <a href="/message" class="gate-sigil group" data-gate>
+                <span class="gate-sigil-text">Transmit</span>
+                <span class="gate-sigil-glow"></span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Debug layer indicator -->
+    <div id="layer-debug" class="fixed top-4 right-4 z-50 text-gray-600/40 text-xs font-mono">
+      LAYER <span id="layer-num">1</span>/4
     </div>
 
     <!-- Navigation hints -->
     <div id="nav-hint" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 text-center">
-      <div class="desktop-hint hidden md:block text-gray-500 text-sm">
-        <span class="key-hint">Enter</span> next · <span class="key-hint">Shift+Enter</span> back
+      <div class="desktop-hint hidden md:block text-gray-500/60 text-sm space-y-1">
+        <div><span class="key-glow">Enter</span> warp forward · <span class="key-glow">F</span> or <span class="key-glow">Space</span> fall</div>
+        <div class="text-gray-600/40 text-xs"><span class="key-glow text-xs">WASD</span> / <span class="key-glow text-xs">Arrows</span> drift</div>
       </div>
-      <div class="mobile-hint md:hidden text-gray-500 text-sm">
-        Tap to continue
+      <div class="mobile-hint md:hidden text-gray-500/60 text-sm">
+        Tap to continue · Long-press to fall
       </div>
     </div>
 
     <style>
-      /* Layer base styles */
+      /* Noise texture */
+      #noise {
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      }
+
+      /* Bloom orbs */
+      .bloom-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0;
+        transition: opacity 1s ease, transform 2s ease;
+      }
+      .bloom-1 {
+        width: 400px; height: 400px;
+        background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+        top: 20%; left: 10%;
+      }
+      .bloom-2 {
+        width: 300px; height: 300px;
+        background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+        bottom: 20%; right: 15%;
+      }
+      .bloom-3 {
+        width: 350px; height: 350px;
+        background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%);
+        top: 50%; left: 50%; transform: translate(-50%, -50%);
+      }
+      body.layer-2 .bloom-1 { opacity: 1; }
+      body.layer-3 .bloom-2 { opacity: 1; }
+      body.layer-4 .bloom-3 { opacity: 1; }
+      body.transitioning .bloom-orb { opacity: 0.5; transform: scale(1.3); }
+
+      /* Luminous text */
+      .glow-text {
+        text-shadow: 0 0 40px rgba(255,255,255,0.1), 0 0 80px rgba(255,255,255,0.05);
+      }
+      .text-gradient {
+        background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 50%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .text-gradient-indigo {
+        background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 50%, #818cf8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .text-gradient-emerald {
+        background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 50%, #34d399 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .text-gradient-amber {
+        background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Key hint glow */
+      .key-glow {
+        display: inline-block;
+        padding: 2px 8px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.85em;
+        text-shadow: 0 0 10px rgba(255,255,255,0.3);
+      }
+
+      /* Gate sigil */
+      .gate-sigil {
+        position: relative;
+        display: inline-block;
+        padding: 16px 32px;
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 2px;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        cursor: pointer;
+      }
+      .gate-sigil:hover {
+        border-color: rgba(255,255,255,0.3);
+        box-shadow: 0 0 30px rgba(255,255,255,0.1), inset 0 0 30px rgba(255,255,255,0.03);
+      }
+      .gate-sigil-text {
+        position: relative;
+        z-index: 1;
+        font-size: 0.9rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.7);
+        text-shadow: 0 0 20px rgba(255,255,255,0.5);
+        transition: all 0.4s ease;
+      }
+      .gate-sigil:hover .gate-sigil-text {
+        color: rgba(255,255,255,0.95);
+        text-shadow: 0 0 30px rgba(255,255,255,0.8);
+      }
+      .gate-sigil-glow {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+      }
+      .gate-sigil:hover .gate-sigil-glow {
+        transform: translateX(100%);
+      }
+
+      /* Sigil icon glow */
+      .sigil-icon {
+        filter: drop-shadow(0 0 20px currentColor);
+        animation: sigil-pulse 4s ease-in-out infinite;
+      }
+      @keyframes sigil-pulse {
+        0%, 100% { opacity: 0.6; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.02); }
+      }
+
+      /* Layer backgrounds */
+      .layer-bg {
+        position: absolute;
+        inset: 0;
+      }
+      .layer-bg-void {
+        background: radial-gradient(ellipse at center, #0a0a0f 0%, #000000 100%);
+      }
+      .layer-bg-monolith {
+        background:
+          radial-gradient(ellipse at 30% 70%, rgba(99,102,241,0.08) 0%, transparent 50%),
+          radial-gradient(ellipse at center, #0a0a12 0%, #000005 100%);
+      }
+      .layer-bg-debris {
+        background:
+          radial-gradient(ellipse at 70% 30%, rgba(16,185,129,0.06) 0%, transparent 50%),
+          radial-gradient(ellipse at 30% 80%, rgba(6,78,59,0.08) 0%, transparent 40%),
+          radial-gradient(ellipse at center, #050a08 0%, #000000 100%);
+      }
+      .layer-bg-beacon {
+        background:
+          radial-gradient(ellipse at center, rgba(245,158,11,0.1) 0%, transparent 40%),
+          radial-gradient(ellipse at center, #0f0a05 0%, #000000 100%);
+      }
+
+      /* Decorative elements */
+      .monolith-shapes {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, transparent 45%, rgba(99,102,241,0.02) 50%, transparent 55%);
+        pointer-events: none;
+      }
+      .debris-particles {
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(1px 1px at 20% 30%, rgba(16,185,129,0.3), transparent),
+          radial-gradient(1px 1px at 80% 20%, rgba(16,185,129,0.2), transparent),
+          radial-gradient(1px 1px at 40% 70%, rgba(16,185,129,0.25), transparent),
+          radial-gradient(1px 1px at 60% 50%, rgba(16,185,129,0.2), transparent),
+          radial-gradient(2px 2px at 90% 80%, rgba(16,185,129,0.15), transparent);
+        pointer-events: none;
+        animation: debris-drift 20s linear infinite;
+      }
+      @keyframes debris-drift {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(-20px, 20px); }
+      }
+      .beacon-rays {
+        position: absolute;
+        inset: 0;
+        background:
+          conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(245,158,11,0.02) 10deg, transparent 20deg, transparent 90deg, rgba(245,158,11,0.02) 100deg, transparent 110deg, transparent 180deg, rgba(245,158,11,0.02) 190deg, transparent 200deg, transparent 270deg, rgba(245,158,11,0.02) 280deg, transparent 290deg);
+        pointer-events: none;
+        animation: beacon-rotate 30s linear infinite;
+      }
+      @keyframes beacon-rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      /* Layer base */
       .layer {
         position: absolute;
         inset: 0;
@@ -97,12 +359,10 @@ import '../styles/global.css';
         pointer-events: none;
         transition: opacity 0.1s ease;
       }
-
       .layer.active {
         opacity: 1;
         pointer-events: auto;
       }
-
       .layer-content {
         position: relative;
         width: 100%;
@@ -110,266 +370,270 @@ import '../styles/global.css';
         transform-style: preserve-3d;
         will-change: transform, filter;
       }
-
-      .layer-bg {
-        position: absolute;
-        inset: 0;
-      }
-
       .layer-inner {
         position: relative;
         z-index: 1;
         will-change: transform;
       }
 
-      /* Idle floating animation */
-      .layer.active .layer-inner {
-        animation: idle-float 6s ease-in-out infinite;
+      /* Idle float */
+      .layer.active:not(.transitioning) .layer-inner {
+        animation: idle-float 8s ease-in-out infinite;
       }
-
-      .layer.transitioning .layer-inner {
-        animation: none;
-      }
-
       @keyframes idle-float {
         0%, 100% { transform: translateY(0) scale(1); }
-        50% { transform: translateY(-8px) scale(1.002); }
+        50% { transform: translateY(-6px) scale(1.001); }
       }
 
-      /* Key hint styling */
-      .key-hint {
-        display: inline-block;
-        padding: 2px 8px;
-        background: rgba(255,255,255,0.1);
-        border-radius: 4px;
-        font-family: monospace;
-        font-size: 12px;
+      /* Warp transition */
+      .layer-content.warp-out {
+        animation: warp-out 900ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+      .layer-content.warp-in {
+        animation: warp-in 900ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+      @keyframes warp-out {
+        0% { transform: scale(1) translateZ(0); filter: blur(0) brightness(1); opacity: 1; }
+        50% { transform: scale(1.8) translateZ(200px); filter: blur(6px) brightness(1.5); opacity: 0.7; }
+        100% { transform: scale(4) translateZ(500px); filter: blur(16px) brightness(2); opacity: 0; }
+      }
+      @keyframes warp-in {
+        0% { transform: scale(0.2) translateZ(-500px); filter: blur(16px) brightness(0.3); opacity: 0; }
+        50% { transform: scale(0.7) translateZ(-100px); filter: blur(4px) brightness(0.8); opacity: 0.7; }
+        100% { transform: scale(1) translateZ(0); filter: blur(0) brightness(1); opacity: 1; }
       }
 
-      /* Gate button pulse */
-      .gate-button {
-        animation: gate-pulse 3s ease-in-out infinite;
+      /* Rift fall transition */
+      .layer-content.rift-out {
+        animation: rift-out 700ms cubic-bezier(0.6, 0, 1, 1) forwards;
+      }
+      .layer-content.rift-in {
+        animation: rift-in 800ms cubic-bezier(0, 0, 0.2, 1) forwards;
+      }
+      @keyframes rift-out {
+        0% { transform: translateY(0) rotate(0deg) scale(1); filter: blur(0) brightness(1); opacity: 1; }
+        30% { transform: translateY(50px) rotate(2deg) scale(0.95); filter: blur(2px) brightness(0.7); opacity: 0.8; }
+        100% { transform: translateY(300px) rotate(5deg) scale(0.7); filter: blur(12px) brightness(0.2); opacity: 0; }
+      }
+      @keyframes rift-in {
+        0% { transform: translateY(-300px) rotate(-3deg) scale(0.7); filter: blur(12px) brightness(0.2); opacity: 0; }
+        60% { transform: translateY(20px) rotate(1deg) scale(1.02); filter: blur(2px) brightness(0.9); opacity: 0.9; }
+        100% { transform: translateY(0) rotate(0deg) scale(1); filter: blur(0) brightness(1); opacity: 1; }
       }
 
-      @keyframes gate-pulse {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.1); }
-        50% { box-shadow: 0 0 20px 2px rgba(255,255,255,0.05); }
+      /* FX overlays */
+      .warp-glow {
+        position: absolute;
+        top: 50%; left: 50%;
+        width: 0; height: 0;
+        background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+      .warp-glow.active {
+        width: 300px; height: 300px;
+        opacity: 0.4;
       }
 
-      /* Transition states applied via JS */
-      .layer-content.travel-out {
-        animation: travel-out 800ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      .rift-slit {
+        position: absolute;
+        top: 0; left: 50%;
+        width: 4px; height: 100%;
+        background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.9) 70%, transparent 100%);
+        transform: translateX(-50%) scaleY(0);
+        opacity: 0;
+        filter: blur(2px);
+        box-shadow: 0 0 30px 10px rgba(255,255,255,0.3);
+      }
+      .rift-slit.active {
+        animation: rift-slit-flash 0.4s ease-out forwards;
+      }
+      @keyframes rift-slit-flash {
+        0% { transform: translateX(-50%) scaleY(0); opacity: 0; }
+        30% { transform: translateX(-50%) scaleY(1); opacity: 1; }
+        100% { transform: translateX(-50%) scaleY(0); opacity: 0; }
       }
 
-      .layer-content.travel-in {
-        animation: travel-in 800ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+      .vignette.active {
+        opacity: 1;
       }
 
-      .layer-content.travel-back-out {
-        animation: travel-back-out 800ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      /* Drift container */
+      #drift-container {
+        transition: transform 0.1s ease-out;
       }
 
-      .layer-content.travel-back-in {
-        animation: travel-back-in 800ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
-      }
-
-      /* Forward travel: zoom in, blur out, fade */
-      @keyframes travel-out {
-        0% {
-          transform: scale(1) translateZ(0);
-          filter: blur(0) contrast(1) brightness(1);
-          opacity: 1;
-        }
-        40% {
-          transform: scale(1.5) translateZ(100px);
-          filter: blur(4px) contrast(1.2) brightness(1.3);
-          opacity: 0.8;
-        }
-        100% {
-          transform: scale(3) translateZ(300px);
-          filter: blur(12px) contrast(1.5) brightness(2);
-          opacity: 0;
-        }
-      }
-
-      /* Forward travel in: start far, zoom to normal */
-      @keyframes travel-in {
-        0% {
-          transform: scale(0.3) translateZ(-300px);
-          filter: blur(12px) contrast(0.8) brightness(0.5);
-          opacity: 0;
-        }
-        60% {
-          transform: scale(0.8) translateZ(-50px);
-          filter: blur(2px) contrast(0.95) brightness(0.9);
-          opacity: 0.8;
-        }
-        100% {
-          transform: scale(1) translateZ(0);
-          filter: blur(0) contrast(1) brightness(1);
-          opacity: 1;
-        }
-      }
-
-      /* Backward travel: zoom out, going back */
-      @keyframes travel-back-out {
-        0% {
-          transform: scale(1) translateZ(0);
-          filter: blur(0) contrast(1) brightness(1);
-          opacity: 1;
-        }
-        40% {
-          transform: scale(0.7) translateZ(-100px);
-          filter: blur(4px) contrast(0.9) brightness(0.8);
-          opacity: 0.8;
-        }
-        100% {
-          transform: scale(0.3) translateZ(-300px);
-          filter: blur(12px) contrast(0.7) brightness(0.5);
-          opacity: 0;
-        }
-      }
-
-      /* Backward travel in: start zoomed, come back */
-      @keyframes travel-back-in {
-        0% {
-          transform: scale(3) translateZ(300px);
-          filter: blur(12px) contrast(1.5) brightness(2);
-          opacity: 0;
-        }
-        60% {
-          transform: scale(1.2) translateZ(50px);
-          filter: blur(2px) contrast(1.1) brightness(1.1);
-          opacity: 0.8;
-        }
-        100% {
-          transform: scale(1) translateZ(0);
-          filter: blur(0) contrast(1) brightness(1);
-          opacity: 1;
-        }
-      }
-
-      /* Hide hint during transitions */
+      /* Hide hints during transition */
       body.transitioning #nav-hint {
         opacity: 0;
         transition: opacity 0.2s;
       }
-
       body:not(.transitioning) #nav-hint {
         opacity: 1;
-        transition: opacity 0.3s 0.5s;
+        transition: opacity 0.4s 0.6s;
       }
     </style>
 
     <script>
-      // Portal state
+      // ============ STATE ============
       let currentLayer = 1;
       let isTransitioning = false;
       const totalLayers = 4;
-      const transitionDuration = 800;
 
-      // Star particle system
+      // Drift state
+      const drift = { x: 0, y: 0, targetX: 0, targetY: 0, vx: 0, vy: 0 };
+      const keys = { up: false, down: false, left: false, right: false };
+      const driftSpeed = 0.8;
+      const driftFriction = 0.92;
+      const driftMax = 60;
+      const mouseParallax = { x: 0, y: 0 };
+
+      // Star state
+      let stars = [];
+      let starSpeed = 0.3;
+      let targetStarSpeed = 0.3;
+      const baseStarSpeed = 0.3;
+      const warpStarSpeed = 20;
+      const fallStarSpeed = 8;
+
+      // Mobile state
+      let longPressTimer = null;
+      let touchStartTime = 0;
+      const longPressDuration = 600;
+
+      // Double click
+      let lastClickTime = 0;
+      const doubleClickThreshold = 300;
+
+      // ============ ELEMENTS ============
       const canvas = document.getElementById('stars');
       const ctx = canvas.getContext('2d');
-      let stars = [];
-      let starSpeed = 0.5;
-      let targetSpeed = 0.5;
-      const baseSpeed = 0.5;
-      const maxSpeed = 15;
+      const driftContainer = document.getElementById('drift-container');
+      const layerDebug = document.getElementById('layer-num');
+      const warpGlow = document.getElementById('warp-glow');
+      const riftSlit = document.getElementById('rift-slit');
+      const vignette = document.getElementById('vignette');
 
+      // ============ CANVAS SETUP ============
       function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
       }
 
-      function createStars(count = 200) {
+      function createStars(count = 250) {
         stars = [];
         for (let i = 0; i < count; i++) {
           stars.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
             z: Math.random() * 1000,
-            size: Math.random() * 1.5 + 0.5,
-            brightness: Math.random() * 0.5 + 0.5
+            size: Math.random() * 1.2 + 0.3,
+            brightness: Math.random() * 0.4 + 0.3
           });
         }
       }
 
       function drawStars() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
+        const centerX = canvas.width / 2 + drift.x * 0.5;
+        const centerY = canvas.height / 2 + drift.y * 0.5;
 
         stars.forEach(star => {
-          // Move star toward viewer
-          star.z -= starSpeed * 10;
-
-          // Reset star if it passes the viewer
+          star.z -= starSpeed * 8;
           if (star.z <= 0) {
             star.z = 1000;
             star.x = Math.random() * canvas.width;
             star.y = Math.random() * canvas.height;
           }
 
-          // Project 3D to 2D
-          const scale = 1000 / star.z;
+          const scale = 800 / star.z;
           const x = (star.x - centerX) * scale + centerX;
           const y = (star.y - centerY) * scale + centerY;
-          const size = star.size * scale * (starSpeed > 2 ? 1 + (starSpeed - 2) * 0.3 : 1);
+          const size = Math.max(0.5, star.size * scale * (starSpeed > 3 ? 1 + (starSpeed - 3) * 0.2 : 1));
 
-          // Draw star with streak when moving fast
-          if (starSpeed > 2) {
-            const streakLength = Math.min(starSpeed * 3, 40);
-            const prevZ = star.z + starSpeed * 10;
-            const prevScale = 1000 / prevZ;
+          if (starSpeed > 3) {
+            const prevZ = star.z + starSpeed * 8;
+            const prevScale = 800 / prevZ;
             const prevX = (star.x - centerX) * prevScale + centerX;
             const prevY = (star.y - centerY) * prevScale + centerY;
 
-            const gradient = ctx.createLinearGradient(prevX, prevY, x, y);
-            gradient.addColorStop(0, `rgba(255, 255, 255, 0)`);
-            gradient.addColorStop(1, `rgba(255, 255, 255, ${star.brightness * 0.8})`);
+            const grad = ctx.createLinearGradient(prevX, prevY, x, y);
+            grad.addColorStop(0, 'rgba(255,255,255,0)');
+            grad.addColorStop(1, `rgba(255,255,255,${star.brightness * 0.7})`);
 
             ctx.beginPath();
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = size * 0.8;
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = size * 0.6;
             ctx.moveTo(prevX, prevY);
             ctx.lineTo(x, y);
             ctx.stroke();
           }
 
-          // Draw star point
           ctx.beginPath();
-          ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+          ctx.fillStyle = `rgba(255,255,255,${star.brightness})`;
           ctx.arc(x, y, size, 0, Math.PI * 2);
           ctx.fill();
         });
 
-        // Smoothly interpolate star speed
-        starSpeed += (targetSpeed - starSpeed) * 0.08;
+        starSpeed += (targetStarSpeed - starSpeed) * 0.06;
       }
 
-      function animateStars() {
+      // ============ DRIFT SYSTEM ============
+      function updateDrift() {
+        // Apply key input
+        if (keys.up) drift.vy -= driftSpeed;
+        if (keys.down) drift.vy += driftSpeed;
+        if (keys.left) drift.vx -= driftSpeed;
+        if (keys.right) drift.vx += driftSpeed;
+
+        // Apply friction
+        drift.vx *= driftFriction;
+        drift.vy *= driftFriction;
+
+        // Update position
+        drift.x += drift.vx;
+        drift.y += drift.vy;
+
+        // Clamp
+        drift.x = Math.max(-driftMax, Math.min(driftMax, drift.x));
+        drift.y = Math.max(-driftMax, Math.min(driftMax, drift.y));
+
+        // Add mouse parallax
+        const finalX = drift.x + mouseParallax.x * 15;
+        const finalY = drift.y + mouseParallax.y * 15;
+
+        driftContainer.style.transform = `translate(${finalX}px, ${finalY}px)`;
+      }
+
+      // ============ ANIMATION LOOP ============
+      function animate() {
         drawStars();
-        requestAnimationFrame(animateStars);
+        updateDrift();
+        requestAnimationFrame(animate);
       }
 
-      // Initialize stars
-      resizeCanvas();
-      createStars();
-      animateStars();
-      window.addEventListener('resize', () => {
-        resizeCanvas();
-        createStars();
-      });
+      // ============ LAYER TRANSITIONS ============
+      function updateLayerClass() {
+        document.body.classList.remove('layer-1', 'layer-2', 'layer-3', 'layer-4');
+        document.body.classList.add(`layer-${currentLayer}`);
+        layerDebug.textContent = currentLayer;
+      }
 
-      // Layer transition
-      function transitionToLayer(targetLayer, direction = 'forward') {
-        if (isTransitioning || targetLayer < 1 || targetLayer > totalLayers || targetLayer === currentLayer) {
-          return;
-        }
+      function warpTransition(targetLayer) {
+        if (isTransitioning || targetLayer < 1 || targetLayer > totalLayers || targetLayer === currentLayer) return;
 
+        console.log(`[WARP] Layer ${currentLayer} -> ${targetLayer}`);
         isTransitioning = true;
         document.body.classList.add('transitioning');
 
@@ -378,107 +642,210 @@ import '../styles/global.css';
         const currentContent = currentEl.querySelector('.layer-content');
         const targetContent = targetEl.querySelector('.layer-content');
 
-        // Accelerate stars
-        targetSpeed = maxSpeed;
+        // FX
+        targetStarSpeed = warpStarSpeed;
+        warpGlow.classList.add('active');
+        vignette.classList.add('active');
 
-        // Apply transition classes
-        if (direction === 'forward') {
-          currentContent.classList.add('travel-out');
-          currentEl.classList.add('transitioning');
-        } else {
-          currentContent.classList.add('travel-back-out');
-          currentEl.classList.add('transitioning');
-        }
+        currentContent.classList.add('warp-out');
+        currentEl.classList.add('transitioning');
 
-        // Midpoint: switch layers
+        setTimeout(() => {
+          warpGlow.classList.remove('active');
+        }, 400);
+
         setTimeout(() => {
           currentEl.classList.remove('active');
-          currentContent.classList.remove('travel-out', 'travel-back-out');
-
-          targetEl.classList.add('active');
-          targetEl.classList.add('transitioning');
-
-          if (direction === 'forward') {
-            targetContent.classList.add('travel-in');
-          } else {
-            targetContent.classList.add('travel-back-in');
-          }
-
+          currentContent.classList.remove('warp-out');
+          targetEl.classList.add('active', 'transitioning');
+          targetContent.classList.add('warp-in');
           currentLayer = targetLayer;
-        }, transitionDuration / 2);
+          updateLayerClass();
+        }, 450);
 
-        // End transition
         setTimeout(() => {
-          targetContent.classList.remove('travel-in', 'travel-back-in');
+          targetContent.classList.remove('warp-in');
           currentEl.classList.remove('transitioning');
           targetEl.classList.remove('transitioning');
-
-          // Decelerate stars
-          targetSpeed = baseSpeed;
-
+          vignette.classList.remove('active');
+          targetStarSpeed = baseStarSpeed;
           isTransitioning = false;
           document.body.classList.remove('transitioning');
-        }, transitionDuration);
+        }, 900);
       }
 
-      // Keyboard navigation
+      function riftFallTransition() {
+        if (isTransitioning || currentLayer === 1) return;
+
+        // Pick random layer different from current (among 2,3,4)
+        const options = [2, 3, 4].filter(l => l !== currentLayer);
+        const targetLayer = options[Math.floor(Math.random() * options.length)];
+
+        console.log(`[RIFT FALL] Layer ${currentLayer} -> ${targetLayer}`);
+        isTransitioning = true;
+        document.body.classList.add('transitioning');
+
+        const currentEl = document.querySelector(`.layer[data-layer="${currentLayer}"]`);
+        const targetEl = document.querySelector(`.layer[data-layer="${targetLayer}"]`);
+        const currentContent = currentEl.querySelector('.layer-content');
+        const targetContent = targetEl.querySelector('.layer-content');
+
+        // FX
+        targetStarSpeed = fallStarSpeed;
+        riftSlit.classList.add('active');
+        vignette.classList.add('active');
+
+        currentContent.classList.add('rift-out');
+        currentEl.classList.add('transitioning');
+
+        setTimeout(() => {
+          riftSlit.classList.remove('active');
+        }, 400);
+
+        setTimeout(() => {
+          currentEl.classList.remove('active');
+          currentContent.classList.remove('rift-out');
+          targetEl.classList.add('active', 'transitioning');
+          targetContent.classList.add('rift-in');
+          currentLayer = targetLayer;
+          updateLayerClass();
+        }, 350);
+
+        setTimeout(() => {
+          targetContent.classList.remove('rift-in');
+          currentEl.classList.remove('transitioning');
+          targetEl.classList.remove('transitioning');
+          vignette.classList.remove('active');
+          targetStarSpeed = baseStarSpeed;
+          isTransitioning = false;
+          document.body.classList.remove('transitioning');
+        }, 800);
+      }
+
+      function gateTransition(href) {
+        if (isTransitioning) return;
+
+        console.log(`[GATE] Navigating to ${href}`);
+        isTransitioning = true;
+        document.body.classList.add('transitioning');
+
+        targetStarSpeed = warpStarSpeed;
+        warpGlow.classList.add('active');
+
+        const layer = document.querySelector('.layer.active');
+        const content = layer.querySelector('.layer-content');
+        content.classList.add('warp-out');
+
+        setTimeout(() => {
+          window.location.href = href;
+        }, 500);
+      }
+
+      // ============ EVENT HANDLERS ============
+      // Keyboard
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
+        // Drift keys (do NOT change layers)
+        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') { keys.up = true; e.preventDefault(); }
+        if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') { keys.down = true; e.preventDefault(); }
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') { keys.left = true; e.preventDefault(); }
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') { keys.right = true; e.preventDefault(); }
+
+        // Layer change keys
+        if (e.key === 'Enter' && !e.repeat) {
           e.preventDefault();
-          if (e.shiftKey) {
-            // Go back
-            transitionToLayer(currentLayer - 1, 'backward');
+          warpTransition(currentLayer + 1);
+        }
+
+        if ((e.key === 'f' || e.key === 'F' || e.key === ' ') && !e.repeat) {
+          e.preventDefault();
+          if (currentLayer === 1) {
+            // From layer 1, warp to layer 2 first
+            warpTransition(2);
           } else {
-            // Go forward
-            transitionToLayer(currentLayer + 1, 'forward');
+            riftFallTransition();
           }
         }
       });
 
-      // Touch/click navigation for mobile
-      let touchStartY = 0;
+      document.addEventListener('keyup', (e) => {
+        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.up = false;
+        if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.down = false;
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+      });
+
+      // Mouse parallax
+      document.addEventListener('mousemove', (e) => {
+        mouseParallax.x = (e.clientX / window.innerWidth - 0.5) * 2;
+        mouseParallax.y = (e.clientY / window.innerHeight - 0.5) * 2;
+      });
+
+      // Double click for fall
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('[data-gate]')) return;
+
+        const now = Date.now();
+        if (now - lastClickTime < doubleClickThreshold) {
+          if (currentLayer === 1) {
+            warpTransition(2);
+          } else {
+            riftFallTransition();
+          }
+        }
+        lastClickTime = now;
+      });
+
+      // Gate clicks
+      document.querySelectorAll('[data-gate]').forEach(gate => {
+        gate.addEventListener('click', (e) => {
+          e.preventDefault();
+          gateTransition(gate.getAttribute('href'));
+        });
+      });
+
+      // Mobile touch
       document.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY;
+        if (e.target.closest('[data-gate]')) return;
+
+        touchStartTime = Date.now();
+        longPressTimer = setTimeout(() => {
+          if (currentLayer === 1) {
+            warpTransition(2);
+          } else {
+            riftFallTransition();
+          }
+        }, longPressDuration);
       }, { passive: true });
 
       document.addEventListener('touchend', (e) => {
-        // Ignore if tapping a link
-        if (e.target.closest('a')) return;
+        if (e.target.closest('[data-gate]')) return;
 
-        const touchEndY = e.changedTouches[0].clientY;
-        const diff = touchStartY - touchEndY;
+        clearTimeout(longPressTimer);
+        const duration = Date.now() - touchStartTime;
 
-        if (Math.abs(diff) < 50) {
-          // Simple tap - go forward
-          transitionToLayer(currentLayer + 1, 'forward');
-        } else if (diff > 50) {
-          // Swipe up - go forward
-          transitionToLayer(currentLayer + 1, 'forward');
-        } else if (diff < -50) {
-          // Swipe down - go back
-          transitionToLayer(currentLayer - 1, 'backward');
+        if (duration < longPressDuration) {
+          // Short tap = warp forward
+          warpTransition(currentLayer + 1);
         }
       }, { passive: true });
 
-      // Gate button click transition
-      document.querySelectorAll('.gate-button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const href = btn.getAttribute('href');
+      document.addEventListener('touchmove', () => {
+        clearTimeout(longPressTimer);
+      }, { passive: true });
 
-          // Quick transition effect before navigation
-          targetSpeed = maxSpeed;
-          document.body.classList.add('transitioning');
+      // ============ INIT ============
+      resizeCanvas();
+      createStars();
+      updateLayerClass();
+      animate();
 
-          const layer = btn.closest('.layer');
-          const content = layer.querySelector('.layer-content');
-          content.classList.add('travel-out');
-
-          setTimeout(() => {
-            window.location.href = href;
-          }, 400);
-        });
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        createStars();
       });
+
+      console.log('[PORTAL] Initialized. Layer 1.');
+      console.log('[CONTROLS] Enter=warp, F/Space=fall, WASD/Arrows=drift');
     </script>
   </body>
 </html>
