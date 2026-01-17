@@ -57,7 +57,7 @@ function formatDate(date: Date): string {
                 <span class="text-gray-700">·</span>
                 <span>{writing.data.category}</span>
                 <span class="text-gray-700">·</span>
-                <span>{writing.wordCount} words</span>
+                <span>{writing.wordCount.englishWords} words · {writing.wordCount.chineseChars} 字</span>
               </div>
               {writing.data.summary && (
                 <p class="text-gray-400">{writing.data.summary}</p>
