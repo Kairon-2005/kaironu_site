@@ -49,9 +49,26 @@ import '../styles/global.css';
             <!-- AION Title Content -->
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
               <div class="layer1-content">
-                <h1 class="layer1-title cinzel" id="main-title">AION</h1>
-                <div class="layer1-divider"></div>
-                <p class="layer1-subtitle">Eternal Moments</p>
+                <!-- Animated Letter Stage -->
+                <div class="l1-title-stage" id="l1-title-stage">
+                  <!-- KAIROS (Line 1) -->
+                  <span class="l1-title-letter cinzel" style="transform: translate(-180px, -40px);" id="l1-k1">K</span>
+                  <span class="l1-title-letter cinzel" style="transform: translate(-110px, -40px);" id="l1-a1">A</span>
+                  <span class="l1-title-letter cinzel" style="transform: translate(-50px, -40px);" id="l1-i1">I</span>
+                  <span class="l1-title-letter cinzel" style="transform: translate(15px, -40px);" id="l1-r1">R</span>
+                  <span class="l1-title-letter cinzel" style="transform: translate(85px, -40px);" id="l1-o1">O</span>
+                  <span class="l1-title-letter cinzel" style="transform: translate(150px, -40px);" id="l1-s1">S</span>
+                  <!-- CHAIRON (Line 2) -->
+                  <span class="l1-title-letter cinzel" style="transform: translate(-210px, 40px);" id="l1-c2">C</span>
+                  <span class="l1-title-letter cinzel" style="transform: translate(-150px, 40px);" id="l1-h2">H</span>
+                  <span class="l1-title-letter cinzel" style="transform: translate(-90px, 40px);" id="l1-a2">A</span>
+                  <span class="l1-title-letter cinzel" style="transform: translate(-30px, 40px);" id="l1-i2">I</span>
+                  <span class="l1-title-letter cinzel" style="transform: translate(30px, 40px);" id="l1-r2">R</span>
+                  <span class="l1-title-letter cinzel" style="transform: translate(95px, 40px);" id="l1-o2">O</span>
+                  <span class="l1-title-letter cinzel" style="transform: translate(165px, 40px);" id="l1-n2">N</span>
+                  <!-- Subtitle -->
+                  <div class="l1-title-sub" id="l1-title-manifesto">Eternal Moments</div>
+                </div>
               </div>
             </div>
           </div>
@@ -69,8 +86,9 @@ import '../styles/global.css';
             <div class="l2-vignette"></div>
             <!-- Gate Link -->
             <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
-              <a href="/writings" class="gate-link" data-gate>
+              <a href="/writings" class="gate-link" data-gate style="display: flex; flex-direction: column; align-items: center;">
                 <span class="layer2-title cinzel">Writings</span>
+                <span class="l2-subtitle cinzel" style="margin-top: 1rem; font-size: clamp(0.75rem, 2vw, 1rem); color: rgba(255, 255, 255, 0.55); letter-spacing: 0.1em; text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);">There is something testamentary as if you are already dead in every writing.</span>
               </a>
             </div>
           </div>
@@ -250,6 +268,83 @@ import '../styles/global.css';
         user-select: none;
       }
 
+      /* Animated Title Stage */
+      .l1-title-stage {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
+        width: 100%;
+      }
+
+      .l1-title-letter {
+        display: inline-block;
+        position: absolute;
+        font-size: clamp(3rem, 10vw, 5rem);
+        font-weight: 700;
+        color: #f8fafc;
+        letter-spacing: normal;
+        transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 0;
+      }
+
+      .l1-title-letter.l1-visible {
+        opacity: 1;
+      }
+
+      .l1-title-letter.l1-hidden {
+        opacity: 0;
+        transform: scale(0.5);
+        pointer-events: none;
+      }
+
+      .l1-title-letter.l1-dissolve {
+        animation: l1-dissolve-effect 1.5s ease forwards;
+      }
+
+      @keyframes l1-dissolve-effect {
+        0% {
+          opacity: 1;
+          filter: blur(0px);
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          filter: blur(2px);
+          transform: scale(1.1);
+        }
+        100% {
+          opacity: 0;
+          filter: blur(8px);
+          transform: scale(0.3) translateY(-20px);
+        }
+      }
+
+      .l1-title-letter.l1-aion-final {
+        color: #ffffff;
+        text-shadow: 0 0 30px rgba(165, 243, 252, 0.5), 0 0 60px rgba(165, 243, 252, 0.2);
+      }
+
+      .l1-title-sub {
+        position: absolute;
+        bottom: -60px;
+        font-family: 'EB Garamond', serif;
+        font-size: clamp(0.8rem, 2vw, 0.9rem);
+        letter-spacing: 0.6em;
+        color: rgba(165, 243, 252, 0.4);
+        opacity: 0;
+        transition: opacity 2s ease;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .l1-title-sub.l1-visible {
+        opacity: 1;
+      }
+
+      /* Legacy title class kept for compatibility but not used */
       .layer1-title {
         font-size: clamp(3rem, 10vw, 7rem);
         font-weight: 700;
@@ -1144,7 +1239,6 @@ import '../styles/global.css';
         
         const ctx = canvas.getContext('2d');
         const runesLayer = document.getElementById('runes-layer');
-        const title = document.getElementById('main-title');
 
         let width, height;
         let particles = [];
@@ -1179,10 +1273,6 @@ import '../styles/global.css';
 
           // Generate runes along the path
           createRunes();
-
-          setTimeout(function() {
-            if (title) title.classList.add('visible');
-          }, 500);
 
           animate();
         }
@@ -1345,6 +1435,183 @@ import '../styles/global.css';
 
         init();
         console.log('[LAYER1] Lemniscate visual initialized');
+      })();
+    </script>
+
+    <!-- ============ LAYER 1 TITLE ANIMATION (KAIROS/CHAIRON → KAIRON → AION) ============ -->
+    <script>
+      /**
+       * Layer 1 Title Animation - KAIROS/CHAIRON merging to KAIRON then AION
+       * Pauses when Layer 1 is not active, resumes when returning
+       */
+      (function() {
+        const letters = {
+          k1: document.getElementById('l1-k1'),
+          a1: document.getElementById('l1-a1'),
+          i1: document.getElementById('l1-i1'),
+          r1: document.getElementById('l1-r1'),
+          o1: document.getElementById('l1-o1'),
+          s1: document.getElementById('l1-s1'),
+          c2: document.getElementById('l1-c2'),
+          h2: document.getElementById('l1-h2'),
+          a2: document.getElementById('l1-a2'),
+          i2: document.getElementById('l1-i2'),
+          r2: document.getElementById('l1-r2'),
+          o2: document.getElementById('l1-o2'),
+          n2: document.getElementById('l1-n2')
+        };
+        const manifesto = document.getElementById('l1-title-manifesto');
+
+        // Check if elements exist
+        if (!letters.k1) return;
+
+        let animationComplete = false;
+        let timeouts = [];
+
+        function wait(ms) {
+          return new Promise(resolve => {
+            const id = setTimeout(resolve, ms);
+            timeouts.push(id);
+          });
+        }
+
+        function clearAllTimeouts() {
+          timeouts.forEach(id => clearTimeout(id));
+          timeouts = [];
+        }
+
+        async function runSequence() {
+          // Reset state
+          animationComplete = false;
+          clearAllTimeouts();
+
+          // Reset all letters to initial state
+          Object.values(letters).forEach(el => {
+            if (el) {
+              el.classList.remove('l1-visible', 'l1-hidden', 'l1-dissolve', 'l1-aion-final');
+              el.style.transform = '';
+            }
+          });
+          if (manifesto) {
+            manifesto.classList.remove('l1-visible');
+            manifesto.style.opacity = '0';
+          }
+
+          // Apply initial positions
+          if (letters.k1) letters.k1.style.transform = 'translate(-180px, -40px)';
+          if (letters.a1) letters.a1.style.transform = 'translate(-110px, -40px)';
+          if (letters.i1) letters.i1.style.transform = 'translate(-50px, -40px)';
+          if (letters.r1) letters.r1.style.transform = 'translate(15px, -40px)';
+          if (letters.o1) letters.o1.style.transform = 'translate(85px, -40px)';
+          if (letters.s1) letters.s1.style.transform = 'translate(150px, -40px)';
+          if (letters.c2) letters.c2.style.transform = 'translate(-210px, 40px)';
+          if (letters.h2) letters.h2.style.transform = 'translate(-150px, 40px)';
+          if (letters.a2) letters.a2.style.transform = 'translate(-90px, 40px)';
+          if (letters.i2) letters.i2.style.transform = 'translate(-30px, 40px)';
+          if (letters.r2) letters.r2.style.transform = 'translate(30px, 40px)';
+          if (letters.o2) letters.o2.style.transform = 'translate(95px, 40px)';
+          if (letters.n2) letters.n2.style.transform = 'translate(165px, 40px)';
+
+          // --- STEP 1: Show KAIROS and CHAIRON ---
+          await wait(500);
+          Object.values(letters).forEach(el => {
+            if (el) el.classList.add('l1-visible');
+          });
+          await wait(2000);
+
+          // Check if still on layer 1
+          if (!document.body.classList.contains('layer-1')) return;
+
+          // --- STEP 2: Merge to KAIRON ---
+          // Hide extra letters: S, C, H, A2, I2, R2, O2
+          ['s1', 'c2', 'h2', 'a2', 'i2', 'r2', 'o2'].forEach(id => {
+            if (letters[id]) letters[id].classList.add('l1-hidden');
+          });
+
+          // Move first line KAIRO to center (y: 0)
+          if (letters.k1) letters.k1.style.transform = 'translate(-180px, 0px)';
+          if (letters.a1) letters.a1.style.transform = 'translate(-110px, 0px)';
+          if (letters.i1) letters.i1.style.transform = 'translate(-50px, 0px)';
+          if (letters.r1) letters.r1.style.transform = 'translate(15px, 0px)';
+          if (letters.o1) letters.o1.style.transform = 'translate(85px, 0px)';
+
+          // Move N from line 2 to end of line 1
+          if (letters.n2) letters.n2.style.transform = 'translate(155px, 0px)';
+
+          await wait(2500);
+
+          // Check if still on layer 1
+          if (!document.body.classList.contains('layer-1')) return;
+
+          // --- STEP 3: Dissolve K and R to form AION ---
+          // Apply dissolve effect to K and R
+          if (letters.k1) letters.k1.classList.add('l1-dissolve');
+          if (letters.r1) letters.r1.classList.add('l1-dissolve');
+
+          // Rearrange A I O N to be centered
+          await wait(100);
+          if (letters.a1) letters.a1.style.transform = 'translate(-120px, 0px)';
+          if (letters.i1) letters.i1.style.transform = 'translate(-40px, 0px)';
+          if (letters.o1) letters.o1.style.transform = 'translate(40px, 0px)';
+          if (letters.n2) letters.n2.style.transform = 'translate(120px, 0px)';
+
+          // Add final glow effect
+          ['a1', 'i1', 'o1', 'n2'].forEach(id => {
+            if (letters[id]) letters[id].classList.add('l1-aion-final');
+          });
+
+          await wait(1000);
+
+          // Check if still on layer 1
+          if (!document.body.classList.contains('layer-1')) return;
+
+          // --- STEP 4: Final positioning with wider spacing ---
+          if (letters.a1) letters.a1.style.transform = 'translate(-160px, 0px)';
+          if (letters.i1) letters.i1.style.transform = 'translate(-55px, 0px)';
+          if (letters.o1) letters.o1.style.transform = 'translate(55px, 0px)';
+          if (letters.n2) letters.n2.style.transform = 'translate(160px, 0px)';
+
+          // Show subtitle
+          if (manifesto) {
+            manifesto.classList.add('l1-visible');
+            manifesto.style.opacity = '1';
+          }
+
+          animationComplete = true;
+          console.log('[LAYER1] Title animation complete');
+        }
+
+        // Start animation on load
+        runSequence();
+
+        // Handle layer visibility changes - pause/resume
+        let wasOnLayer1 = document.body.classList.contains('layer-1');
+
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+              const isOnLayer1 = document.body.classList.contains('layer-1');
+
+              // Coming back to layer 1 - restart animation if not complete
+              if (isOnLayer1 && !wasOnLayer1) {
+                if (!animationComplete) {
+                  runSequence();
+                }
+              }
+
+              // Leaving layer 1 - clear pending timeouts
+              if (!isOnLayer1 && wasOnLayer1) {
+                clearAllTimeouts();
+              }
+
+              wasOnLayer1 = isOnLayer1;
+            }
+          });
+        });
+
+        observer.observe(document.body, { attributes: true });
+
+        console.log('[LAYER1] Title animation system initialized');
       })();
     </script>
 
