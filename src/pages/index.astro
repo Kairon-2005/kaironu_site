@@ -2732,5 +2732,105 @@ import '../styles/global.css';
         console.log('[LAYER5] Orpheus system initialized');
       })();
     </script>
+  <!-- Home Index 目录入口（独立容器） -->
+  <div id="home-index" class="home-index">
+    <button class="home-index-toggle" aria-label="Open Index">Index</button>
+    <nav class="home-index-menu" hidden>
+      <a href="/writings">Writings</a>
+      <a href="/fragments">Fragments</a>
+      <a href="/message">Message</a>
+      <a href="/music">Music</a>
+    </nav>
+  </div>
+
+  <style>
+  /* Home Index 目录样式 */
+  .home-index {
+    position: fixed;
+    right: 2vw;
+    bottom: 2vw;
+    z-index: 50;
+    font-size: 18px;
+    pointer-events: auto;
+    user-select: none;
+  }
+  .home-index-toggle {
+    background: rgba(30,30,30,0.7);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .home-index-toggle:hover,
+  .home-index-toggle:focus {
+    opacity: 1;
+  }
+  .home-index-menu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    right: 0;
+    bottom: 36px;
+    background: rgba(20,20,20,0.95);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    padding: 8px 0;
+    min-width: 120px;
+    opacity: 0.98;
+  }
+  .home-index-menu a {
+    color: #eee;
+    text-decoration: none;
+    padding: 6px 18px;
+    font-size: 14px;
+    transition: background 0.15s;
+  }
+  .home-index-menu a:hover {
+    background: rgba(60,60,60,0.18);
+  }
+  </style>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggle = document.querySelector('.home-index-toggle');
+    const menu = document.querySelector('.home-index-menu');
+    let open = false;
+
+    // 展开/收起目录
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      open = !open;
+      menu.hidden = !open;
+    });
+
+    // 点击目录链接直接跳转
+    menu.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') {
+        window.location.href = e.target.href;
+        e.preventDefault();
+      }
+    });
+
+    // 点击页面其他区域收起目录
+    document.addEventListener('click', function (e) {
+      if (open && !toggle.contains(e.target) && !menu.contains(e.target)) {
+        menu.hidden = true;
+        open = false;
+      }
+    });
+
+    // 可选：ESC 键收起
+    document.addEventListener('keydown', function (e) {
+      if (open && e.key === 'Escape') {
+        menu.hidden = true;
+        open = false;
+      }
+    });
+  });
+  </script>
   </body>
 </html>
