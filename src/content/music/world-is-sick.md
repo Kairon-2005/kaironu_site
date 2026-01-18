@@ -2,7 +2,7 @@
 title: "世界病了，我是它的脓疮"
 tags: ["post-punk","diary"]
 audio: "/audio/世界病了，我是它的脓疮.mp3"
-order: 4
+order: 1
 note: "Sleep-talking of a gifted introverted type."
 draft: false
 ---

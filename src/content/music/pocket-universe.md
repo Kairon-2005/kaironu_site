@@ -2,7 +2,7 @@
 title: "他口袋里装着整个宇宙"
 tags: ["family","ballad"]
 audio: "/audio/他口袋里装着整个宇宙.mp3"
-order: 3
+order: 2
 note: "2025 Nov"
 draft: false
 ---

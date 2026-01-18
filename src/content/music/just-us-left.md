@@ -2,7 +2,7 @@
 title: "就剩下我和他了"
 tags: ["indie","emotional"]
 audio: "/audio/就剩下我和他了.mp3"
-order: 2
+order: 3
 note: "A poem. A story."
 draft: false
 ---
