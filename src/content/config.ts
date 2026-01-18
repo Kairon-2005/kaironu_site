@@ -11,4 +11,16 @@ const writings = defineCollection({
   }),
 });
 
-export const collections = { writings };
+const music = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    tags: z.array(z.string()),
+    audio: z.string(),           // path to mp3, e.g. /audio/track.mp3
+    order: z.number(),           // display order (lower = earlier)
+    note: z.string().optional(), // creation note (time/place)
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { writings, music };
