@@ -1,96 +1,164 @@
 # Digital Doppler
 
-A minimal portal website built with Astro, featuring a message/letterbox system.
+A minimal, elegant portal website built with Astro, featuring a multi-layer visual experience and a complete message/letterbox system.
+
+## ✨ Features
+
+### 🌌 Visual Experience
+- **Multi-layer portal**: 4 interactive layers with unique visual themes
+  - Layer 1: KAIROS/CHAIRON → KAIRON → AION animated title with lemniscate snake
+  - Layer 2: Writings section with Three.js text tunnel
+  - Layer 3: Fragments with crystalline sphere visualization
+  - Layer 4: Message section with water ripple effects
+- **Smooth transitions**: Layer-based navigation with visual effects
+- **Responsive design**: Works on all screen sizes
+
+### 💌 Message System
+Three types of messages:
+
+| Type | Description | Reply Method |
+|------|-------------|--------------|
+| **Public Letter** | Published on site after approval | Reply visible on site |
+| **Treehole** | Private storage, no reply expected | None |
+| **Private Letter** | Private message wanting a reply | Key-based retrieval |
+
+### 🔐 Key-Based Reply System
+- Users receive a unique cryptographic key after submitting a private letter
+- No account needed - just save your key
+- Visit `/message/reply/{id}` and enter your key to view the reply
+- SHA-256 hashed with server-side pepper for security
+
+### 👤 Admin Interface
+- Access via `/admin/inbox` with Basic Auth
+- View all messages with filtering (type, status, wants reply)
+- Approve/reject messages
+- Write and publish replies
+- View metadata (timestamps, IP hash, user agent)
 
 ## 🚀 Project Structure
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
+```
 /
 ├── public/
+│   └── assets/
 ├── src/
+│   ├── content/
+│   │   ├── config.ts
+│   │   └── writings/          # Markdown blog posts
+│   ├── data/
+│   │   └── fragments.json     # Fragments data
 │   ├── pages/
-│   │   ├── index.astro          # Main portal
-│   │   ├── message.astro        # Message submission form
-│   │   ├── letters.astro        # Public letters list
-│   │   ├── letters/[id].astro   # Individual letter view
+│   │   ├── index.astro        # Main portal (4 layers)
+│   │   ├── writings.astro     # Writings list
+│   │   ├── fragments.astro    # Fragments display
+│   │   ├── message.astro      # Message submission form
 │   │   ├── message/
-│   │   │   ├── sent.astro       # Success confirmation
-│   │   │   ├── key/[id].astro   # Reply key display
-│   │   │   └── reply/[id].astro # Reply viewing
+│   │   │   ├── sent.astro     # Success confirmation
+│   │   │   ├── letters.astro  # Public letters list
+│   │   │   ├── key/[id].astro # Reply key display
+│   │   │   ├── reply/[id].astro # View reply with key
+│   │   │   └── letter/[id].astro # Individual letter
+│   │   ├── writings/
+│   │   │   └── [slug].astro   # Individual writing
 │   │   ├── admin/
-│   │   │   └── inbox.astro      # Admin interface
+│   │   │   └── inbox.astro    # Admin dashboard
 │   │   └── api/
-│   │       ├── message.ts       # Message submission
-│   │       ├── message/reply.ts # Reply retrieval
-│   │       └── admin/message/update.ts # Admin updates
-│   └── styles/
-│       └── global.css
-├── db/migrations/
-│   └── 001_messages.sql         # Database schema
+│   │       ├── message.ts     # POST: Submit message
+│   │       ├── message/
+│   │       │   └── reply.ts   # POST: Retrieve reply with key
+│   │       └── admin/
+│   │           └── message/
+│   │               ├── list.ts   # GET: List messages
+│   │               └── update.ts # POST: Update message/reply
+│   ├── styles/
+│   │   └── global.css
+│   └── utils/
+│       ├── auth.ts            # Admin auth & env validation
+│       ├── crypto.ts          # Key generation & hashing
+│       └── wordCount.ts       # Word count utility
+├── db/
+│   └── migrations/
+│       ├── 001_messages.sql   # Initial schema
+│       └── 002_update_schema.sql # Schema updates
 └── package.json
 ```
 
 ## 🧞 Commands
 
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+| Command           | Action                                       |
+| :---------------- | :------------------------------------------- |
+| `npm install`     | Install dependencies                         |
+| `npm run dev`     | Start dev server at `localhost:4321`         |
+| `npm run build`   | Build for production to `./dist/`            |
+| `npm run preview` | Preview production build locally             |
 
 ## 🔧 Environment Variables
 
-For deployment, set the following environment variables:
-
 ### Required
-- `POSTGRES_URL` - Vercel Postgres connection string
-- `MESSAGE_KEY_PEPPER` - Secret string for hashing reply keys (generate a random string)
+```bash
+POSTGRES_URL="postgres://..."     # Vercel Postgres connection string
+MESSAGE_KEY_PEPPER="random-secret" # Secret for hashing reply keys
+```
 
 ### Admin Access
-- `ADMIN_USER` - Admin username (default: 'admin')
-- `ADMIN_PASS` - Admin password (default: 'admin')
-
-### Example .env
 ```bash
-POSTGRES_URL="postgres://username:password@host:port/database"
-MESSAGE_KEY_PEPPER="your-random-secret-pepper-string-here"
-ADMIN_USER="admin"
-ADMIN_PASS="your-secure-admin-password"
+ADMIN_USER="your-username"
+ADMIN_PASS="your-secure-password"
 ```
 
 ## 📦 Database Setup
 
-1. Set up a Vercel Postgres database
-2. Run the migration script in `db/migrations/001_messages.sql`
-3. Set the `POSTGRES_URL` environment variable
+1. Create a Vercel Postgres (or Neon) database
+2. Run the migration scripts in order:
+   ```sql
+   -- Run db/migrations/001_messages.sql
+   -- Run db/migrations/002_update_schema.sql (if upgrading)
+   ```
+3. Set `POSTGRES_URL` environment variable in Vercel
 
-## 🎯 Features
+### Database Schema
 
-### Message System
-- **Public letters**: Can be approved by admin and displayed publicly with optional replies
-- **Private messages**: Either "treehole" (no reply) or key-based reply system
-- **Anonymous or named**: Users can choose to be anonymous or provide a display name
-- **Reply keys**: Secure viewing of replies using cryptographic keys (no accounts needed)
+**messages**
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| created_at | TIMESTAMPTZ | Creation time |
+| type | TEXT | 'public', 'treehole', or 'private' |
+| body | TEXT | Message content |
+| nickname | TEXT | Optional display name |
+| wants_reply | BOOLEAN | Whether user wants a reply |
+| email | TEXT | Optional email (for email notifications) |
+| key_hash | TEXT | Hashed reply key |
+| status | TEXT | 'pending', 'approved', or 'rejected' |
+| admin_notes | TEXT | Internal admin notes |
+| ip_hash | TEXT | Hashed IP for rate limiting |
+| user_agent | TEXT | Browser user agent |
 
-### Admin Interface
-- **Basic Auth protected**: Access via `/admin/inbox`
-- **Message management**: Approve/reject messages, write replies
-- **Filtering**: By mode, status, reply preference, and reply status
-- **Rate limiting**: Built-in spam protection (5 submissions per 10 minutes per IP)
+**replies**
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| message_id | UUID | Foreign key to messages |
+| created_at | TIMESTAMPTZ | Creation time |
+| reply_body | TEXT | Reply content |
+| published | BOOLEAN | Whether reply is visible |
+| published_at | TIMESTAMPTZ | When reply was published |
 
-### Security
-- **No raw IP storage**: Only one-way hashes for rate limiting
-- **Cryptographic reply keys**: SHA-256 hashed with server-side pepper
-- **Basic Auth**: Constant-time comparison for admin credentials
-- **Input validation**: Server-side validation for all user inputs
+## 🔒 Security Features
 
-## 👀 Want to learn more?
+- **No raw IP storage**: Only one-way SHA-256 hashes
+- **Cryptographic reply keys**: 16-byte random keys, hashed with pepper
+- **Rate limiting**: 5 submissions per 10 minutes per IP
+- **Constant-time auth**: Prevents timing attacks on admin login
+- **Server-side validation**: All inputs validated before processing
 
-Feel free to check [Astro documentation](https://docs.astro.build).
+## 🚀 Deployment
+
+Deployed on Vercel with:
+- **Astro SSR** via `@astrojs/vercel` adapter
+- **Vercel Postgres** (or Neon) for database
+- **Automatic deployments** from GitHub
+
+## 📝 License
+
+MIT
