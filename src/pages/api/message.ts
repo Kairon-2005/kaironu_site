@@ -29,14 +29,11 @@ function checkRateLimit(ipHash: string): boolean {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  // Declare data outside try block so it's accessible in catch
-  let data: any = null;
-  
   try {
     // Validate required environment variables
     validateEnvVars(['MESSAGE_KEY_PEPPER']);
     
-    // Debug: Check if POSTGRES_URL is set (don't log the actual value!)
+    // Check if POSTGRES_URL is set
     if (!process.env.POSTGRES_URL) {
       console.error('POSTGRES_URL environment variable is not set');
       return new Response(JSON.stringify({ ok: false, error: 'Database configuration error' }), {
