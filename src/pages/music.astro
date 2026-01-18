@@ -14,7 +14,6 @@ const tracks = allMusic
     <title>原创音乐 | Kairon</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; background: #000; color: #fff; overflow: hidden; font-family: 'EB Garamond', serif; }
@@ -156,7 +155,16 @@ const tracks = allMusic
         </div>
     </div>
 
-    <script>
+    <script is:inline>
+        // 等待 Three.js 加载完成
+        function waitForThree(callback) {
+            if (typeof THREE !== 'undefined' && typeof TWEEN !== 'undefined') {
+                callback();
+            } else {
+                setTimeout(() => waitForThree(callback), 50);
+            }
+        }
+
         let scene, camera, renderer, planets = [], stars;
         const planetData = [
             { radius: 1.5, distance: 8, speed: 0.005, hasRing: true, color: 0xffffff, name: "STATION 01" },
@@ -277,12 +285,15 @@ const tracks = allMusic
         });
 
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
         });
 
-        init();
+        // 使用 waitForThree 确保库加载完成
+        waitForThree(init);
     </script>
 </body>
 </html>
