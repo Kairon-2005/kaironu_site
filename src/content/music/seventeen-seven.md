@@ -2,7 +2,7 @@
 title: "17.7"
 tags: ["melody-rap", "diary"]
 audio: "/audio/17.7.mp3"
-order: 4
+order: 1
 note: "Younger anger."
 draft: false
 ---

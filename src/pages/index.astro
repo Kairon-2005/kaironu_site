@@ -134,6 +134,30 @@ import '../styles/global.css';
             </div>
           </div>
         </div>
+
+        <!-- Layer 5: Music / ORPHEUS -->
+        <div class="layer" data-layer="5" data-route="/music">
+          <div class="layer-content">
+            <div class="layer-bg layer-bg-orpheus"></div>
+            <!-- Layer 5 3D Canvas Container -->
+            <div id="l5-canvas-container">
+              <canvas id="l5-tube-canvas"></canvas>
+            </div>
+            <!-- Layer 5 Overlays -->
+            <div class="l5-grain"></div>
+            <div class="l5-vignette"></div>
+            <!-- Gate Link -->
+            <div class="layer-inner flex flex-col items-center justify-center min-h-screen px-8 text-center">
+              <div class="flex flex-col items-center">
+                <a href="/music" class="gate-link l5-title-link" data-gate>
+                  <h1 class="layer5-title cinzel">ORPHEUS</h1>
+                </a>
+                <div class="l5-divider"></div>
+                <p class="l5-subtitle">Frequency of the cosmos for itself</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -663,6 +687,115 @@ import '../styles/global.css';
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
       }
 
+      /* ============ LAYER 5: ORPHEUS / MUSIC ============ */
+      .layer-bg-orpheus {
+        background: radial-gradient(ellipse at center, #080808 0%, #020617 100%);
+      }
+
+      /* Layer 5 Canvas Container */
+      #l5-canvas-container {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+      }
+      #l5-tube-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+        pointer-events: none;
+      }
+      body.layer-5 #l5-tube-canvas {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* Layer 5 Grain */
+      .l5-grain {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.05;
+        pointer-events: none;
+        z-index: 50;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      }
+
+      /* Layer 5 Vignette */
+      .l5-vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at center, transparent 0%, rgba(2, 6, 23, 0.4) 40%, rgba(2, 6, 23, 0.9) 100%);
+        z-index: 2;
+        pointer-events: none;
+      }
+
+      /* Layer 5 Title - ORPHEUS */
+      .layer5-title {
+        font-size: clamp(3rem, 10vw, 5rem);
+        font-weight: 700;
+        color: #f8fafc;
+        text-shadow: 0 0 20px rgba(165, 243, 252, 0.3), 0 0 40px rgba(165, 243, 252, 0.1);
+        letter-spacing: 0.6em;
+        margin-right: -0.6em;
+        transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .gate-link:hover .layer5-title,
+      .l5-title-link:hover .layer5-title {
+        text-shadow: 0 0 30px rgba(165, 243, 252, 0.6), 0 0 60px rgba(165, 243, 252, 0.3);
+        color: #fff;
+      }
+
+      /* Layer 5 Divider */
+      .l5-divider {
+        height: 1px;
+        width: 6rem;
+        background: linear-gradient(to right, transparent, rgba(34, 211, 238, 0.3), transparent);
+        margin: 2rem auto 1rem auto;
+      }
+
+      /* Layer 5 Subtitle */
+      .l5-subtitle {
+        color: rgba(207, 250, 254, 0.4);
+        font-size: clamp(0.65rem, 2vw, 0.875rem);
+        letter-spacing: 0.5em;
+        text-transform: uppercase;
+        font-weight: 300;
+        font-family: 'EB Garamond', serif;
+      }
+
+      /* Layer 5 Title Link */
+      .l5-title-link {
+        pointer-events: auto;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      /* Layer 5 Fade In Animation */
+      .layer[data-layer="5"].active .layer5-title,
+      .layer[data-layer="5"].active .l5-divider,
+      .layer[data-layer="5"].active .l5-subtitle {
+        animation: l5-fade-in 2.5s forwards ease-out;
+      }
+      .layer[data-layer="5"].active .l5-divider {
+        animation-delay: 0.5s;
+        opacity: 0;
+      }
+      .layer[data-layer="5"].active .l5-subtitle {
+        animation-delay: 0.8s;
+        opacity: 0;
+      }
+      @keyframes l5-fade-in {
+        to { opacity: 1; }
+      }
+
       /* Layer base */
       .layer {
         position: absolute;
@@ -868,7 +1001,7 @@ import '../styles/global.css';
       // ============ STATE ============
       let currentLayer = 1;
       let isTransitioning = false;
-      const totalLayers = 4;
+      const totalLayers = 5;
 
       // Drift state
       const drift = { x: 0, y: 0, vx: 0, vy: 0 };
@@ -1015,7 +1148,7 @@ import '../styles/global.css';
 
       // ============ LAYER TRANSITIONS ============
       function updateLayerClass() {
-        document.body.classList.remove('layer-1', 'layer-2', 'layer-3', 'layer-4');
+        document.body.classList.remove('layer-1', 'layer-2', 'layer-3', 'layer-4', 'layer-5');
         document.body.classList.add(`layer-${currentLayer}`);
       }
 
@@ -2501,6 +2634,104 @@ import '../styles/global.css';
         checkLayer();
         
         console.log('[LAYER4] Water ripple system initialized');
+      })();
+    </script>
+
+    <!-- ============ LAYER 5 ORPHEUS 3D TUBES SYSTEM ============ -->
+    <script type="module">
+      /**
+       * Layer 5 Visual - 3D Tubes (Cosmic Frequency)
+       * Only runs when Layer 5 is active, pauses otherwise
+       */
+      (function() {
+        const canvas = document.getElementById('l5-tube-canvas');
+        if (!canvas) return;
+
+        let tubeApp = null;
+        let isActive = false;
+        let isInitialized = false;
+
+        async function initTubes() {
+          if (isInitialized) return;
+
+          try {
+            const module = await import('https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js');
+            const TubesCursor = module.default;
+
+            tubeApp = TubesCursor(canvas, {
+              tubes: {
+                colors: ["#22d3ee", "#818cf8", "#ffffff"],
+                lights: {
+                  intensity: 400,
+                  colors: ["#06b6d4", "#ffffff", "#4f46e5", "#000000"]
+                }
+              }
+            });
+
+            isInitialized = true;
+            console.log('[LAYER5] 3D Tubes initialized');
+
+            // Click randomize colors (only when layer 5 is active and not clicking gate links)
+            window.addEventListener('mousedown', (e) => {
+              if (!isActive) return;
+              if (e.target.closest('.gate-link') || e.target.closest('[data-gate]')) return;
+
+              const randomHex = () => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+              const newTubes = [randomHex(), randomHex(), "#ffffff"];
+              const newLights = [randomHex(), randomHex(), randomHex(), "#000000"];
+              tubeApp.tubes.setColors(newTubes);
+              tubeApp.tubes.setLightsColors(newLights);
+            });
+
+          } catch (err) {
+            console.error('[LAYER5] 3D Tubes failed to initialize:', err);
+          }
+        }
+
+        function start() {
+          if (isActive) return;
+          isActive = true;
+          canvas.style.opacity = '1';
+          canvas.style.pointerEvents = 'auto';
+          
+          if (!isInitialized) {
+            initTubes();
+          }
+          
+          console.log('[LAYER5] Tubes started');
+        }
+
+        function stop() {
+          isActive = false;
+          canvas.style.opacity = '0';
+          canvas.style.pointerEvents = 'none';
+          console.log('[LAYER5] Tubes stopped');
+        }
+
+        // Watch for layer changes
+        function checkLayer() {
+          const isLayer5 = document.body.classList.contains('layer-5');
+          if (isLayer5 && !isActive) {
+            start();
+          } else if (!isLayer5 && isActive) {
+            stop();
+          }
+        }
+
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class') {
+              checkLayer();
+            }
+          });
+        });
+
+        observer.observe(document.body, { attributes: true });
+
+        // Initial check
+        checkLayer();
+
+        console.log('[LAYER5] Orpheus system initialized');
       })();
     </script>
   </body>

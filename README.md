@@ -5,13 +5,20 @@ A minimal, elegant portal website built with Astro, featuring a multi-layer visu
 ## ✨ Features
 
 ### 🌌 Visual Experience
-- **Multi-layer portal**: 4 interactive layers with unique visual themes
+- **Multi-layer portal**: 5 interactive layers with unique visual themes
   - Layer 1: KAIROS/CHAIRON → KAIRON → AION animated title with lemniscate snake
   - Layer 2: Writings section with Three.js text tunnel
   - Layer 3: Fragments with crystalline sphere visualization
   - Layer 4: Message section with water ripple effects
+  - Layer 5: ORPHEUS music portal with 3D tube visualization
 - **Smooth transitions**: Layer-based navigation with visual effects
 - **Responsive design**: Works on all screen sizes
+
+### 🎵 Music Section
+- **ORPHEUS Portal**: Layer 5 features an interactive 3D tube visualization
+- **Content Collection**: Music tracks stored as Markdown with frontmatter
+- **Track Details**: Each track displays title, release date, streaming links, and lyrics
+- **Visual Effects**: Click anywhere to randomize tube colors
 
 ### 💌 Message System
 Three types of messages:
@@ -44,13 +51,15 @@ Three types of messages:
 ├── src/
 │   ├── content/
 │   │   ├── config.ts
-│   │   └── writings/          # Markdown blog posts
+│   │   ├── writings/          # Markdown blog posts
+│   │   └── music/             # Music tracks with lyrics
 │   ├── data/
 │   │   └── fragments.json     # Fragments data
 │   ├── pages/
-│   │   ├── index.astro        # Main portal (4 layers)
+│   │   ├── index.astro        # Main portal (5 layers)
 │   │   ├── writings.astro     # Writings list
 │   │   ├── fragments.astro    # Fragments display
+│   │   ├── music.astro        # Music list
 │   │   ├── message.astro      # Message submission form
 │   │   ├── message/
 │   │   │   ├── sent.astro     # Success confirmation
@@ -60,6 +69,8 @@ Three types of messages:
 │   │   │   └── letter/[id].astro # Individual letter
 │   │   ├── writings/
 │   │   │   └── [slug].astro   # Individual writing
+│   │   ├── music/
+│   │   │   └── [slug].astro   # Individual track
 │   │   ├── admin/
 │   │   │   └── inbox.astro    # Admin dashboard
 │   │   └── api/
