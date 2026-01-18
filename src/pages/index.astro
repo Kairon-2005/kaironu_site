@@ -716,11 +716,8 @@ import '../styles/global.css';
 
       /* Layer 5 Grain */
       .l5-grain {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        position: absolute;
+        inset: 0;
         opacity: 0.05;
         pointer-events: none;
         z-index: 50;
@@ -770,9 +767,8 @@ import '../styles/global.css';
         font-family: 'EB Garamond', serif;
       }
 
-      /* Layer 5 Title Link */
+      /* Layer 5 Title Link - only enable pointer events when layer is active */
       .l5-title-link {
-        pointer-events: auto;
         cursor: pointer;
         text-decoration: none;
         color: inherit;
@@ -1312,9 +1308,11 @@ import '../styles/global.css';
       });
 
       document.querySelectorAll('[data-gate]').forEach(gate => {
-        gate.addEventListener('click', (e) => {
+        gate.addEventListener('click', function(e) {
           e.preventDefault();
-          gateTransition(gate.getAttribute('href'));
+          const href = this.getAttribute('href');
+          console.log('[GATE] Clicked:', href);
+          gateTransition(href);
         });
       });
 
