@@ -33,6 +33,15 @@ export const POST: APIRoute = async ({ request }) => {
     // Validate required environment variables
     validateEnvVars(['MESSAGE_KEY_PEPPER']);
     
+    // Debug: Check if POSTGRES_URL is set (don't log the actual value!)
+    if (!process.env.POSTGRES_URL) {
+      console.error('POSTGRES_URL environment variable is not set');
+      return new Response(JSON.stringify({ ok: false, error: 'Database configuration error' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
     const data = await request.json();
     
     // Validate required fields
@@ -87,13 +96,13 @@ export const POST: APIRoute = async ({ request }) => {
       replyKeyHash = hashReplyKey(replyKey);
     }
 
-    // Insert message into database
+    // Insert message into database using @vercel/postgres with pooled connection (POSTGRES_URL)
     const result = await sql`
       INSERT INTO messages (
-        type, reply_preference, nickname, email, body, 
+        type, nickname, email, body, 
         ip_hash, user_agent, key_hash, wants_reply, status
       ) VALUES (
-        ${data.type}, ${data.replyPreference}, ${data.nickname || null}, 
+        ${data.type}, ${data.nickname || null}, 
         ${data.email || null}, ${data.body.trim()}, 
         ${ipHash}, ${userAgent}, ${replyKeyHash}, ${data.replyPreference !== 'none'},
         'pending'
@@ -115,6 +124,17 @@ export const POST: APIRoute = async ({ request }) => {
     
   } catch (error) {
     console.error('Error creating message:', error);
+    
+    // Provide more specific error message for connection issues
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    if (errorMessage.includes('invalid_connection_string') || errorMessage.includes('connection')) {
+      console.error('Database connection error - check POSTGRES_URL environment variable');
+      return new Response(JSON.stringify({ ok: false, error: 'Database connection error' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
     return new Response(JSON.stringify({ ok: false, error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

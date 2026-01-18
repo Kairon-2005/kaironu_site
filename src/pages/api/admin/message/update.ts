@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import { sql } from '@vercel/postgres';
 import { validateAuth, validateEnvVars } from '../../../../utils/auth';
 
+export const prerender = false;
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Validate required environment variables

@@ -8,10 +8,11 @@ let error = null;
 
 try {
   const result = await sql`
-    SELECT id, display_name, created_at, body, replied_at, reply_text
-    FROM messages 
-    WHERE mode = 'public' AND status = 'approved'
-    ORDER BY created_at DESC
+    SELECT m.id, m.nickname, m.created_at, m.body, r.created_at as replied_at, r.reply_body
+    FROM messages m
+    LEFT JOIN replies r ON m.id = r.message_id AND r.published = true
+    WHERE m.type = 'public' AND m.status = 'approved'
+    ORDER BY m.created_at DESC
   `;
   letters = result.rows;
 } catch (err) {
@@ -65,14 +66,14 @@ try {
                 <a href={`/message/letter/${letter.id}`} class="block group">
                   <div class="flex justify-between items-start mb-3">
                     <h3 class="text-[#F5F2EA] font-serif italic group-hover:text-white transition-colors duration-300">
-                      {letter.display_name}
+                      {letter.nickname || 'Anonymous'}
                     </h3>
                     <time class="text-[#F5F2EA]/50 text-sm">{date}</time>
                   </div>
                   
                   <p class="text-[#F5F2EA]/80 leading-relaxed">{excerpt}</p>
                   
-                  {letter.reply_text && (
+                  {letter.reply_body && (
                     <div class="mt-3 text-[#F5F2EA]/60 text-sm">
                       Has reply
                     </div>
