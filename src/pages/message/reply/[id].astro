@@ -1,11 +1,7 @@
 ---
 import '../../../styles/global.css';
 
-export const prerender = true;
-
-export async function getStaticPaths() {
-  return [];
-}
+export const prerender = false;
 
 const { id } = Astro.params;
 ---
